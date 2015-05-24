@@ -2,6 +2,7 @@
 from twisted.internet import reactor, protocol, endpoints
 from twisted.protocols import basic
 import libadventure
+world=libadventure.World()
 
 class GameProtocol(basic.LineReceiver):
     def __init__(self, factory):

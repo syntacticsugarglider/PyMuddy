@@ -15,7 +15,7 @@ class World:
 	def move_player(self,room1,room2,playername):
 		room2.players[playername]=room1.players[playername]
 		room2.players[playername].room=room2
-		del room1.players[playername]
+		del room1.players[]
 class Room:
 	def __init__(self,name,appearance,contents={}):
 		self.appearance=appearance
@@ -28,3 +28,4 @@ class Player:
 		
 
 
+playername
