@@ -1,14 +1,28 @@
 #!C:\Python27
-from twisted.internet import protocol, reactor, endpoints
+from twisted.internet import reactor, protocol, endpoints
+from twisted.protocols import basic
 import libadventure
 
-class Echo(protocol.Protocol):
-    def dataReceived(self, data):
-        self.transport.write(data)
+class GameProtocol(basic.LineReceiver):
+    def __init__(self, factory):
+        self.factory = factory
 
-class EchoFactory(protocol.Factory):
+    def connectionMade(self):
+        self.factory.clients.add(self)
+
+    def connectionLost(self, reason):
+        self.factory.clients.remove(self)
+
+    def lineReceived(self, line):
+        for c in self.factory.clients:
+            c.sendLine("<{}> {}".format(self.transport.getHost(), line))
+
+class GameFactory(protocol.Factory):
+    def __init__(self):
+        self.clients = set()
+
     def buildProtocol(self, addr):
-        return Echo()
+        return GameProtocol(self)
 
-endpoints.serverFromString(reactor, "tcp:1234").listen(EchoFactory())
+endpoints.serverFromString(reactor, "tcp:1234").listen(GameFactory())
 reactor.run()
