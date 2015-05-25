@@ -18,21 +18,31 @@ class GameProtocol(basic.LineReceiver):
         print("Connection recieved from %s" % str(self.transport.getPeer()))
         print("Requesting username")
     def connectionLost(self, reason):
-        self.factory.clients.remove(self)
+    	world.remove_player(self.username)
         print("Connection lost from %s" % str(self.peer))
+        for c in self.factory.clients:
+    		if c!=self:
+    			c.sendLine(b'%s has left the game' % self.username.encode('utf8'))
+        self.factory.clients.remove(self)
 
     def lineReceived(self, line):
     	if self.state=="PLAYING":
-    		self.sendLine(world.process_command(line.decode('utf8'),self.username).encode('utf8'))
+    		if line.decode('utf8')[0:3]=="say":
+    			for c in self.factory.clients:
+    				if c!=self:
+    					c.sendLine(("%s>%s" % self.username,line.decode(utf8)[3:]).encode('utf8'))
+    		else:
+    			self.sendLine(world.process_command(line.decode('utf8'),self.username).encode('utf8'))
     	if self.state=="USERNAME":
     		self.username=line.decode('utf8')
     		self.sendLine(b'Welcome, %s!' % self.username.encode('utf8'))
-    		self.sendLine(b'Spawn : You are in a plain nondescript room with a single bare lightbulb hanging from the ceiling. A dark and forbidding hallway leads west out of the room.')
     		for c in self.factory.clients:
     			if c!=self:
     				c.sendLine(b'%s has joined the game!' % self.username.encode('utf8'))
     		print("Client at %s gave username %s, logged in" % (self.peer,self.username))
     		world.add_player(libadventure.Player(self.username))
+    		
+    		self.sendLine(world.process_command('look',self.username).encode('utf8'))
     		self.state="PLAYING"
     	
         #for c in self.factory.clients:

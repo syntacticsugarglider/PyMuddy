@@ -15,6 +15,8 @@ class World:
 		room2.players[playername]=room1.players[playername]
 		room2.players[playername].room=room2
 		del room1.players[playername]
+	def remove_player(self,playername):
+		del self.players[playername]
 	def process_command(self,command,playername):
 		player=self.players[playername]
 		extra=""
@@ -28,37 +30,37 @@ class World:
 		elif command=="west" or command=="w" or command=="go w" or command=="go west":
 			if player.room.west!=None:
 				self.move_player(player.room,self.rooms[player.room.west],player.name)
-				return player.room.name+" : "+player.room.appearance
+				return self.process_command('look',playername)
 			else:
 				return "You can't go that way!"
 		elif command=="east" or command=="e" or command=="go e" or command=="go east":
 			if player.room.east!=None:
 				self.move_player(player.room,self.rooms[player.room.east],player.name)
-				return player.room.name+" : "+player.room.appearance
+				return self.process_command('look',playername)
 			else:
 				return "You can't go that way!"
 		elif command=="north" or command=="n" or command=="go n" or command=="go north":
 			if player.room.north!=None:
 				self.move_player(player.room,self.rooms[player.room.north],player.name)
-				return player.room.name+" : "+player.room.appearance
+				return self.process_command('look',playername)
 			else:
 				return "You can't go that way!"
 		elif command=="south" or command=="s" or command=="go s" or command=="go south":
 			if player.room.south!=None:
 				self.move_player(player.room,self.rooms[player.room.south],player.name)
-				return player.room.name+" : "+player.room.appearance
+				return self.process_command('look',playername)
 			else:
 				return "You can't go that way!"
 		elif command=="up" or command=="u" or command=="go u" or command=="go up":
 			if player.room.up!=None:
 				self.move_player(player.room,self.rooms[player.room.up],player.name)
-				return player.room.name+" : "+player.room.appearance
+				return self.process_command('look',playername)
 			else:
 				return "You jump fruitlessly."
 		elif command=="down" or command=="d" or command=="go d" or command=="go down":
 			if player.room.down!=None:
 				self.move_player(player.room,self.rooms[player.room.down],player.name)
-				return player.room.name+" : "+player.room.appearance
+				return self.process_command('look',playername)
 			else:
 				return "You can't go that way!"
 		else:
