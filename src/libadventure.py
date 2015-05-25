@@ -141,7 +141,7 @@ class Room:
 				for datatype in datatypes:
 					if line[0:len(datatype[0])]==datatype[0]:
 						if datatype!="contents":
-							datatype[1](line[len(datatype)+3:])
+							datatype[1](line[len(datatype)+3:].strip("\n"))
 						else:
 							for x in line[len(datatype):].split():
 								item=libitems.Item(x)
