@@ -74,6 +74,7 @@ Enter your choice > \r
 			if line.decode('utf8')=="2":
 				self.sendLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 				self.sendLine("Please enter a username > ".encode('utf8'))
+				self.state="CREATEACCOUNT1"
 				return
 		if self.state=="PLAYING":
 			if line.decode('utf8')[0:3]=="say":
@@ -102,16 +103,16 @@ Enter your choice > \r
 Welcome to the incredible PyMuddy!\r
 1) If you have been here before, log in!\r
 2) Otherwise, register an account!\r
-Enter your choice >\r
+Enter your choice (1,2) >\r
 		""".encode('utf8'))
 		if self.state=="USERLOGIN2":
 			usercontrol_json=json.load(userfp)
 			userfp.seek(0)
 			data=usercontrol_json[u'logins']
 			if line.decode('utf8')==self.password_correct:
-				self.sendLine(b"Login sucessful. Please press enter to continue.\r")
+				self.sendLine(b"Login sucessful. Please press enter to continue.\r\n")
 				self.state="PLAYING"
-				self.sendLine(b'Welcome, %s\r!' % self.username.encode('utf8'))
+				self.sendLine(b'Welcome, %s\r\n!' % self.username.encode('utf8'))
 				for c in self.factory.clients:
 					if c!=self:
 						c.sendLine(b'%s has joined the game\r!' % self.username.encode('utf8'))
@@ -124,17 +125,62 @@ Enter your choice >\r
 				self.state="PLAYING"
 				return
 			else:
-				self.sendLine(b"Bad password\r")
+				self.sendLine(b"Bad password\r\n")
 				self.state="MENU"
 				self.sendLine(b'''
 Welcome to the incredible PyMuddy!\r
 1) If you have been here before, log in!\r
 2) Otherwise, register an account!\r
-Enter your choice > \r
+Enter your choice (1,2) > \r
 				''')
-
-	    #for c in self.factory.clients:
-	      #  c.sendLine("<{}> {}".format(self.transport.getHost(), world.commandProcessor.process(line,self.transport.getHost())))
+		if self.state=="CREATEACCOUNT1":
+			usercontrol_json=json.load(userfp)
+			userfp.seek(0)
+			data=usercontrol_json[u'logins']
+			for x in data:
+				test=x[u'username']
+				check=line.decode('utf8')
+				check2=unicode(check)
+				if test==check2:
+					self.sendLine(b"Username taken already, sorry :(\r\n")
+					self.state="MENU"
+					self.sendLine(b'''
+Welcome to the incredible PyMuddy!\r
+1) If you have been here before, log in!\r
+2) Otherwise, register an account!\r
+Enter your choice (1,2) > \r
+					''')
+					return
+				if test=="\n" or test=="\n\r" or test==" " or " " in test:
+					self.sendLine(b"Bad username. Spaces are not allowed\r\n")
+					self.state="MENU"
+					self.sendLine(b'''
+Welcome to the incredible PyMuddy!\r
+1) If you have been here before, log in!\r
+2) Otherwise, register an account!\r
+Enter your choice (1,2) > \r
+					''')
+					return
+			self.create_name=unicode(line.decode('utf8'))
+			self.sendLine("\n\rPlease enter your password below\n\rThis will be sent as unencrypted plaintext, so make sure it's something new that isn't important\n\rPassword > \n\r")
+			self.state="CREATEACCOUNT2"
+			return
+		if self.state=="CREATEACCOUNT2":
+			self.create_password=line
+			usercontrol_json=json.load(userfp)
+			userfp.seek(0)
+			usercontrol_json[u'logins'].append({"username":unicode(self.create_name),"password":unicode(self.create_password)})
+			self.sendLine("\n\rThanks for creating an account.\n\rNow log in at the main menu\n\r")
+			self.state="MENU"
+			self.sendLine(b'''
+Welcome to the incredible PyMuddy!\r
+1) If you have been here before, log in!\r
+2) Otherwise, register an account!\r
+Enter your choice (1,2) > \r
+			''')
+			json.dump(usercontrol_json,userfp)
+			userfp.seek(0)
+			return
 
 class GameFactory(protocol.Factory):
 	def __init__(self):
