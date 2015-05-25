@@ -1,6 +1,7 @@
 #!python
 import json
 import libinventory
+import libitems
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
 	sys.stdout.write(text2)
@@ -113,7 +114,7 @@ class World:
 		else:
 			return "I'm not sure I understand you"
 class Room:
-	def __init__(self,name,appearance,contents={},west=None,east=None,north=None,south=None,up=None,down=None):
+	def __init__(self,name,appearance,contents={},fromfile=None,west=None,east=None,north=None,south=None,up=None,down=None):
 		self.appearance=appearance
 		self.name=name
 		self.contents=contents
@@ -124,6 +125,30 @@ class Room:
 		self.south=south
 		self.up=up
 		self.down=down
+		datatypes=[("appearance",self.appearance),("name",self.name),("contents",self.contents),("east",self.east),("north",self.north),("south",self.south),("west",self.west),("up",self.up),("down",self.down)]
+		if fromfile!=None:
+			try:
+				self.fp=open(fromfile)
+			except:
+				log("Warning - Bad room file path %s!\n" % fromfile)
+				del self
+				return
+			self.fp.seek(0)
+			for line in self.fp.readlines():
+				for datatype in datatypes:
+					if line[0:len(datatype[0])-1]==datatype[0]:
+						if datatype!=:"contents":
+							datatype[1]=line[len(datatype):]
+						else:
+							for x in line[len(datatype):].split():
+								item=libitems.Item(x)
+								self.contents[item.name]=item
+			try:
+				self.fp.close()
+				del self.fp
+			except:
+				pass
+
 class Player:
 	def __init__(self,name):
 		self.inventory=libinventory.Inventory()
