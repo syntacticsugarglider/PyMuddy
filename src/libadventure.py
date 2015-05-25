@@ -2,6 +2,8 @@
 import json
 import libinventory
 import libitems
+from datetime import datetime
+import sys
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
 	sys.stdout.write(text2)
