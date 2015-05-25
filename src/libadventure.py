@@ -17,7 +17,11 @@ class World:
 		del room1.players[playername]
 	def remove_player(self,playername):
 		del self.players[playername]
-	def process_command(self,command,playername):
+	def saytoplayer(self,playername,text,factory):
+		for c in factory.clients:
+			if c.player.name==playername:
+				c.sendLine(text.encode('utf8'))
+	def process_command(self,command,playername,factory=None):
 		player=self.players[playername]
 		extra=""
 		if command=="look" or command=="l":
@@ -29,37 +33,73 @@ class World:
 			return player.room.name+" : "+player.room.appearance+extra
 		elif command=="west" or command=="w" or command=="go w" or command=="go west":
 			if player.room.west!=None:
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s leaves to the west" % player.name,factory)
 				self.move_player(player.room,self.rooms[player.room.west],player.name)
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s enters from the east" % player.name,factory)
 				return self.process_command('look',playername)
 			else:
 				return "You can't go that way!"
 		elif command=="east" or command=="e" or command=="go e" or command=="go east":
 			if player.room.east!=None:
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s leaves to the east",factory)
 				self.move_player(player.room,self.rooms[player.room.east],player.name)
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s enters from the west" % player.name,factory)
 				return self.process_command('look',playername)
 			else:
 				return "You can't go that way!"
 		elif command=="north" or command=="n" or command=="go n" or command=="go north":
 			if player.room.north!=None:
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s leaves to the north",factory)
 				self.move_player(player.room,self.rooms[player.room.north],player.name)
 				return self.process_command('look',playername)
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s enters from the south" % player.name,factory)
 			else:
 				return "You can't go that way!"
 		elif command=="south" or command=="s" or command=="go s" or command=="go south":
 			if player.room.south!=None:
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s leaves to the south",factory)
 				self.move_player(player.room,self.rooms[player.room.south],player.name)
 				return self.process_command('look',playername)
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s enters from the north" % player.name,factory)
 			else:
 				return "You can't go that way!"
 		elif command=="up" or command=="u" or command=="go u" or command=="go up":
 			if player.room.up!=None:
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s leaves upwards",factory)
 				self.move_player(player.room,self.rooms[player.room.up],player.name)
 				return self.process_command('look',playername)
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s enters from below" % player.name,factory)
 			else:
 				return "You jump fruitlessly."
 		elif command=="down" or command=="d" or command=="go d" or command=="go down":
 			if player.room.down!=None:
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s leaves downwards",factory)
 				self.move_player(player.room,self.rooms[player.room.down],player.name)
+				for key,value in self.players.iteritems():
+					if value.room==player.room:
+						self.saytoplayer(value.name,"%s enters from above" % player.name,factory)
 				return self.process_command('look',playername)
 			else:
 				return "You can't go that way!"

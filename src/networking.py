@@ -24,15 +24,18 @@ class GameProtocol(basic.LineReceiver):
     		if c!=self:
     			c.sendLine(b'%s has left the game' % self.username.encode('utf8'))
         self.factory.clients.remove(self)
-
+    def saytoeveryone(self,text):
+    	for c in self.factory.clients:
+    			if c!=self:
+    				c.sendLine(text.encode('utf8'))
     def lineReceived(self, line):
     	if self.state=="PLAYING":
     		if line.decode('utf8')[0:3]=="say":
     			for c in self.factory.clients:
     				if c!=self:
-    					c.sendLine(("%s>%s" % self.username,line.decode(utf8)[3:]).encode('utf8'))
+    					c.sendLine(("%s>%s" % (self.username,line.decode('utf8')[3:])).encode('utf8'))
     		else:
-    			self.sendLine(world.process_command(line.decode('utf8'),self.username).encode('utf8'))
+    			self.sendLine(world.process_command(line.decode('utf8'),self.username,self.factory).encode('utf8'))
     	if self.state=="USERNAME":
     		self.username=line.decode('utf8')
     		self.sendLine(b'Welcome, %s!' % self.username.encode('utf8'))
@@ -40,9 +43,11 @@ class GameProtocol(basic.LineReceiver):
     			if c!=self:
     				c.sendLine(b'%s has joined the game!' % self.username.encode('utf8'))
     		print("Client at %s gave username %s, logged in" % (self.peer,self.username))
-    		world.add_player(libadventure.Player(self.username))
-    		
-    		self.sendLine(world.process_command('look',self.username).encode('utf8'))
+    		new_player=libadventure.Player(self.username)
+    		new_player.thing=self
+    		self.player=new_player
+    		world.add_player(new_player)
+    		self.sendLine(world.process_command('look',self.username,self.factory).encode('utf8'))
     		self.state="PLAYING"
     	
         #for c in self.factory.clients:
