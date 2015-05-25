@@ -3,8 +3,10 @@ from twisted.internet import reactor, protocol, endpoints
 from twisted.protocols import basic
 import libadventure
 room1=libadventure.Room("Spawn","You are in a plain nondescript room with a single bare lightbulb hanging from the ceiling. A dark and forbidding hallway leads west out of the room.",west="Dark Hallway")
-room2=libadventure.Room("Dark Hallway","You are in a dark hallway that leads east-to-west. It opens on a lit door to the east and continues into darkness on the west.",east="Spawn")
+room2=libadventure.Room("Dark Hallway","You are in a dark hallway that leads east-to-west. It opens on a lit door to the east and continues into darkness on the west.",east="Spawn",west="Telegate")
+room3=libadventure.Room("Telegate","A white haze surrounds you, and then clears. You are in a 3-metre-by-3-metre white box with no doors or windows. You feel confused.")
 world=libadventure.World(room1)
+world.add_room(room3)
 world.add_room(room2)
 class GameProtocol(basic.LineReceiver):
     def __init__(self, factory):
@@ -23,6 +25,10 @@ class GameProtocol(basic.LineReceiver):
         for c in self.factory.clients:
     		if c!=self:
     			c.sendLine(b'%s has left the game' % self.username.encode('utf8'))
+    	try:
+    		del self.player
+    	except:
+    		pass
         self.factory.clients.remove(self)
     def saytoeveryone(self,text):
     	for c in self.factory.clients:
@@ -35,7 +41,7 @@ class GameProtocol(basic.LineReceiver):
     				if c!=self:
     					c.sendLine(("%s>%s" % (self.username,line.decode('utf8')[3:])).encode('utf8'))
     		else:
-    			self.sendLine(world.process_command(line.decode('utf8'),self.username,self.factory).encode('utf8'))
+    			self.sendLine(world.process_command(line.decode('utf8'),self.username,self.factory,self.username).encode('utf8'))
     	if self.state=="USERNAME":
     		self.username=line.decode('utf8')
     		self.sendLine(b'Welcome, %s!' % self.username.encode('utf8'))
