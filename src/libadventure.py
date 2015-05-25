@@ -1,4 +1,5 @@
 #!C:\Python27
+import json
 class World:
 	def __init__(self,initialroom):
 		self.rooms={}
