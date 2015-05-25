@@ -1,5 +1,9 @@
-#!C:\Python27
+#!python
 import json
+import libinventory
+def log(text):
+	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
+	sys.stdout.write(text2)
 class World:
 	def __init__(self,initialroom):
 		self.rooms={}
@@ -104,6 +108,8 @@ class World:
 				return self.process_command('look',playername)
 			else:
 				return "You can't go that way!"
+		elif command=="xyzzy":
+			return("Honestly? Really? Are you actually saying that? Yes you are.")
 		else:
 			return "I'm not sure I understand you"
 class Room:
@@ -120,5 +126,5 @@ class Room:
 		self.down=down
 class Player:
 	def __init__(self,name):
-		self.inventory={}
+		self.inventory=libinventory.Inventory()
 		self.name=name

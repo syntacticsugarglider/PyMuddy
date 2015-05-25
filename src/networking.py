@@ -1,4 +1,4 @@
-#!C:\Python27
+#!python
 print("Importing and configuring base modules (datetime,sys)..."),
 from datetime import datetime
 import sys
@@ -87,6 +87,16 @@ Enter your choice > \r
 			usercontrol_json=json.load(userfp)
 			userfp.seek(0)
 			data=usercontrol_json[u'logins']
+			if line.decode('utf8') in world.players:
+				self.sendLine("That user is already logged in!\n\r")
+				self.state="MENU"
+				self.sendLine("""
+Welcome to the incredible PyMuddy!\r
+1) If you have been here before, log in!\r
+2) Otherwise, register an account!\r
+Enter your choice (1,2) >\r
+				""".encode('utf8'))
+				return
 			for i,x in enumerate(data):
 				if x[u'username']==unicode(line.decode('utf8')):
 					self.username=x[u'username'.encode('utf8')]
@@ -105,6 +115,7 @@ Welcome to the incredible PyMuddy!\r
 2) Otherwise, register an account!\r
 Enter your choice (1,2) >\r
 		""".encode('utf8'))
+			return
 		if self.state=="USERLOGIN2":
 			usercontrol_json=json.load(userfp)
 			userfp.seek(0)
