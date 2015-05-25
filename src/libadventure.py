@@ -127,20 +127,21 @@ class Room:
 		self.south=south
 		self.up=up
 		self.down=down
-		datatypes=[("appearance",self.appearance),("name",self.name),("contents",self.contents),("east",self.east),("north",self.north),("south",self.south),("west",self.west),("up",self.up),("down",self.down)]
+		datatypes=[("appearance",self.set_1),("name",self.set_2),("contents",self.set_3),("east",self.set_4),("north",self.set_5),("south",self.set_6),("west",self.set_7),("up",self.set_8),("down",self.set_9)]
 		if fromfile!=None:
 			try:
-				self.fp=open(fromfile)
-			except:
+				log("Loading room %s\n" % fromfile)
+				self.fp=open(fromfile,"r+")
+			except BaseException as e:
 				log("Warning - Bad room file path %s!\n" % fromfile)
 				del self
 				return
 			self.fp.seek(0)
 			for line in self.fp.readlines():
 				for datatype in datatypes:
-					if line[0:len(datatype[0])-1]==datatype[0]:
+					if line[0:len(datatype[0])]==datatype[0]:
 						if datatype!="contents":
-							datatype[1]=line[len(datatype):]
+							datatype[1](line[len(datatype)+3:])
 						else:
 							for x in line[len(datatype):].split():
 								item=libitems.Item(x)
@@ -148,8 +149,27 @@ class Room:
 			try:
 				self.fp.close()
 				del self.fp
+				log("Done! - loaded room name %s\n" % self.name)
 			except:
 				pass
+	def set_1(self,x):
+		self.appearance=x
+	def set_2(self,x):
+		self.name=x
+	def set_3(self,x):
+		self.contents=x
+	def set_4(self,x):
+		self.east=x
+	def set_5(self,x):
+		self.north=x
+	def set_6(self,x):
+		self.south=x
+	def set_7(self,x):
+		self.west=x
+	def set_8(self,x):
+		self.up=x
+	def set_9(self,x):
+		self.down=x				
 
 class Player:
 	def __init__(self,name):

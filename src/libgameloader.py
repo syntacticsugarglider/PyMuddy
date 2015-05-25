@@ -7,7 +7,7 @@ class RoomLoader:
 		self.worldpointer=world
 		self.rooms=[]
 		for line in self.fp.readlines():
-			self.rooms.append(libadventure.Room("","",fromfile=line))
+			self.rooms.append(libadventure.Room("","",fromfile=line.strip("\n\r")))
 		for room in self.rooms:
 			self.worldpointer.add_room(room)
 		self.fp.close()
