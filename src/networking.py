@@ -37,10 +37,11 @@ class GameProtocol(basic.LineReceiver):
 	def connectionMade(self):
 		self.factory.clients.add(self)
 		self.state="MENU"
-		self.sendLine("""		Welcome to the incredible PyMuddy!
-		1) If you have been here before, log in!
-		2) Otherwise, register an account!
-		Enter your choice > 
+		self.sendLine("""
+Welcome to the incredible PyMuddy!\r
+1) If you have been here before, log in!\r
+2) Otherwise, register an account!\r
+Enter your choice > \r
 		""".encode('utf8'))
 		self.peer=self.transport.getPeer()
 		log("Connection recieved from %s\n" % str(self.transport.getPeer()))
@@ -53,7 +54,7 @@ class GameProtocol(basic.LineReceiver):
 		log("Connection lost from %s\n" % str(self.peer))
 		for c in self.factory.clients:
 			if c!=self:
-				c.sendLine(b'%s has left the game' % self.username.encode('utf8'))
+				c.sendLine(b'%s has left the game\r' % self.username.encode('utf8'))
 		try:
 			del self.player
 		except:
@@ -98,22 +99,22 @@ class GameProtocol(basic.LineReceiver):
 			self.sendLine("Bad username")
 			self.state="MENU"
 			self.sendLine("""
-Welcome to the incredible PyMuddy!
-1) If you have been here before, log in!
-2) Otherwise, register an account!
-Enter your choice > 
+Welcome to the incredible PyMuddy!\r
+1) If you have been here before, log in!\r
+2) Otherwise, register an account!\r
+Enter your choice >\r
 		""".encode('utf8'))
 		if self.state=="USERLOGIN2":
 			usercontrol_json=json.load(userfp)
 			userfp.seek(0)
 			data=usercontrol_json[u'logins']
 			if line.decode('utf8')==self.password_correct:
-				self.sendLine(b"Login sucessful. Please press enter to continue.")
+				self.sendLine(b"Login sucessful. Please press enter to continue.\r")
 				self.state="PLAYING"
-				self.sendLine(b'Welcome, %s!' % self.username.encode('utf8'))
+				self.sendLine(b'Welcome, %s\r!' % self.username.encode('utf8'))
 				for c in self.factory.clients:
 					if c!=self:
-						c.sendLine(b'%s has joined the game!' % self.username.encode('utf8'))
+						c.sendLine(b'%s has joined the game\r!' % self.username.encode('utf8'))
 				log("Client at %s gave username %s, logged in\n" % (self.peer,self.username))
 				new_player=libadventure.Player(self.username)
 				new_player.thing=self
@@ -123,13 +124,13 @@ Enter your choice >
 				self.state="PLAYING"
 				return
 			else:
-				self.sendLine(b"Bad password")
+				self.sendLine(b"Bad password\r")
 				self.state="MENU"
 				self.sendLine(b'''
-		Welcome to the incredible PyMuddy!
-		1) If you have been here before, log in!
-		2) Otherwise, register an account!
-		Enter your choice > 
+Welcome to the incredible PyMuddy!\r
+1) If you have been here before, log in!\r
+2) Otherwise, register an account!\r
+Enter your choice > \r
 				''')
 
 	    #for c in self.factory.clients:
