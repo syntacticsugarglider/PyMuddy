@@ -31,68 +31,69 @@ world=libadventure.World(room1)
 world.add_room(room3)
 world.add_room(room2)
 class GameProtocol(basic.LineReceiver):
-    def __init__(self, factory):
-        self.factory = factory
-        self.state=""
-    def connectionMade(self):
-        self.factory.clients.add(self)
-        self.state="MENU"
-        self.sendLine(b'''
-        Welcome to the incredible PyMuddy!
-        1) If you have been here before, log in!
-        2) Otherwise, register an account!
-        Enter your choice > 
-        ''')
-        self.peer=self.transport.getPeer()
-        log("Connection recieved from %s\n" % str(self.transport.getPeer()))
-        log("Requesting username\n")
-    def connectionLost(self, reason):
-    	world.remove_player(self.username)
-        log("Connection lost from %s\n" % str(self.peer))
-        for c in self.factory.clients:
-    		if c!=self:
-    			c.sendLine(b'%s has left the game' % self.username.encode('utf8'))
-    	try:
-    		del self.player
-    	except:
-    		pass
-        self.factory.clients.remove(self)
-    def saytoeveryone(self,text):
-    	for c in self.factory.clients:
-    			if c!=self:
-    				c.sendLine(text.encode('utf8'))
-    def lineReceived(self, line):
-    	if self.state=="MENU":
-    		if line.decode('utf8')=="1":
-				c.sendLine("Username > ")
+	def __init__(self, factory):
+		self.factory = factory
+		self.state=""
+	def connectionMade(self):
+		self.factory.clients.add(self)
+		self.state="MENU"
+		self.sendLine("""		Welcome to the incredible PyMuddy!
+		1) If you have been here before, log in!
+		2) Otherwise, register an account!
+		Enter your choice > 
+		""".encode('utf8'))
+		self.peer=self.transport.getPeer()
+		log("Connection recieved from %s\n" % str(self.transport.getPeer()))
+		log("Sent menu to %s\n" % str(self.transport.getPeer()))
+	def connectionLost(self, reason):
+		try:
+			world.remove_player(self.username)
+		except:
+			log('Warning - error removing disconnected player!\n')
+		log("Connection lost from %s\n" % str(self.peer))
+		for c in self.factory.clients:
+			if c!=self:
+				c.sendLine(b'%s has left the game' % self.username.encode('utf8'))
+		try:
+			del self.player
+		except:
+			pass
+		self.factory.clients.remove(self)
+	def saytoeveryone(self,text):
+		for c in self.factory.clients:
+				if c!=self:
+					c.sendLine(text.encode('utf8'))
+	def lineReceived(self, line):
+		log("Recieved line \n%s\n from client %s" % (line.decode('utf8'),str(self.transport.getPeer())))
+		if self.state=="MENU":
+			if line.decode('utf8')=="1":
+				self.sendLine("Username > ")
 				self.state="USERLOGIN1"
-    		if line.decode('utf8')=="2":
-    			usercontrol_json=json.load(userfp)
-				userfp.seek(0)
-    			self.sendLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-    			self.sendLine("Please enter a username > ".encode('utf8'))
-    	if self.state=="PLAYING":
-    		if line.decode('utf8')[0:3]=="say":
-    			for c in self.factory.clients:
-    				if c!=self:
-    					c.sendLine(("%s>%s" % (self.username,line.decode('utf8')[3:])).encode('utf8'))
-    		else:
-    			self.sendLine(world.process_command(line.decode('utf8'),self.username,self.factory,self.username).encode('utf8'))
-    	if self.state=="USERNAME":
-    		self.username=line.decode('utf8')
-    		self.sendLine(b'Welcome, %s!' % self.username.encode('utf8'))
-    		for c in self.factory.clients:
-    			if c!=self:
-    				c.sendLine(b'%s has joined the game!' % self.username.encode('utf8'))
-    		log("Client at %s gave username %s, logged in\n" % (self.peer,self.username))
-    		new_player=libadventure.Player(self.username)
-    		new_player.thing=self
-    		self.player=new_player
-    		world.add_player(new_player)
-    		self.sendLine(world.process_command('look',self.username,self.factory).encode('utf8'))
-    		self.state="PLAYING"
-    	if self.state="USERLOGIN1":
-    		usercontrol_json=json.load(userfp)
+			if line.decode('utf8')=="2":
+				self.sendLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+				self.sendLine("Please enter a username > ".encode('utf8'))
+		if self.state=="PLAYING":
+			if line.decode('utf8')[0:3]=="say":
+				for c in self.factory.clients:
+					if c!=self:
+						c.sendLine(("%s>%s" % (self.username,line.decode('utf8')[3:])).encode('utf8'))
+			else:
+				self.sendLine(world.process_command(line.decode('utf8'),self.username,self.factory,self.username).encode('utf8'))
+		if self.state=="USERNAME":
+			self.username=line.decode('utf8')
+			self.sendLine(b'Welcome, %s!' % self.username.encode('utf8'))
+			for c in self.factory.clients:
+				if c!=self:
+					c.sendLine(b'%s has joined the game!' % self.username.encode('utf8'))
+			log("Client at %s gave username %s, logged in\n" % (self.peer,self.username))
+			new_player=libadventure.Player(self.username)
+			new_player.thing=self
+			self.player=new_player
+			world.add_player(new_player)
+			self.sendLine(world.process_command('look',self.username,self.factory).encode('utf8'))
+			self.state="PLAYING"
+		if self.state=="USERLOGIN1":
+			usercontrol_json=json.load(userfp)
 			userfp.seek(0)
 			data=usercontrol_json[u'logins']
 			for i,x in enumerate(data):
@@ -105,38 +106,38 @@ class GameProtocol(basic.LineReceiver):
 					return
 			self.sendLine("Bad username")
 			self.state="MENU"
-        	self.sendLine(b'''
-        Welcome to the incredible PyMuddy!
-        1) If you have been here before, log in!
-        2) Otherwise, register an account!
-        Enter your choice > 
-        ''')
-        if self.state="USERLOGIN2":
-        	usercontrol_json=json.load(userfp)
+			self.sendLine("""
+Welcome to the incredible PyMuddy!
+1) If you have been here before, log in!
+2) Otherwise, register an account!
+Enter your choice > 
+		""".encode('utf8'))
+		if self.state=="USERLOGIN2":
+			usercontrol_json=json.load(userfp)
 			userfp.seek(0)
 			data=usercontrol_json[u'logins']
-    		if data[i][u'password']==self.password_correct:
-    			c.sendLine(b"Login sucessful. Please press enter to continue.")
-    			self.state="PLAYING"
-    		else:
-    			elf.sendLine(b"Bad password")
+			if data[i][u'password']==self.password_correct:
+				self.sendLine(b"Login sucessful. Please press enter to continue.")
+				self.state="PLAYING"
+			else:
+				self.sendLine(b"Bad password")
 				self.state="MENU"
-        		self.sendLine(b'''
-        Welcome to the incredible PyMuddy!
-        1) If you have been here before, log in!
-        2) Otherwise, register an account!
-        Enter your choice > 
-        		''')
+				self.sendLine(b'''
+		Welcome to the incredible PyMuddy!
+		1) If you have been here before, log in!
+		2) Otherwise, register an account!
+		Enter your choice > 
+				''')
 
-        #for c in self.factory.clients:
-          #  c.sendLine("<{}> {}".format(self.transport.getHost(), world.commandProcessor.process(line,self.transport.getHost())))
+	    #for c in self.factory.clients:
+	      #  c.sendLine("<{}> {}".format(self.transport.getHost(), world.commandProcessor.process(line,self.transport.getHost())))
 
 class GameFactory(protocol.Factory):
-    def __init__(self):
-        self.clients = set()
+	def __init__(self):
+		self.clients = set()
 
-    def buildProtocol(self, addr):
-        return GameProtocol(self)
+	def buildProtocol(self, addr):
+		return GameProtocol(self)
 
 endpoints.serverFromString(reactor, "tcp:1234").listen(GameFactory())
 reactor.run()
