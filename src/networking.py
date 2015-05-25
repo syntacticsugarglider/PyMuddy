@@ -69,9 +69,11 @@ class GameProtocol(basic.LineReceiver):
 			if line.decode('utf8')=="1":
 				self.sendLine("Username > ")
 				self.state="USERLOGIN1"
+				return
 			if line.decode('utf8')=="2":
 				self.sendLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 				self.sendLine("Please enter a username > ".encode('utf8'))
+				return
 		if self.state=="PLAYING":
 			if line.decode('utf8')[0:3]=="say":
 				for c in self.factory.clients:
@@ -79,19 +81,6 @@ class GameProtocol(basic.LineReceiver):
 						c.sendLine(("%s>%s" % (self.username,line.decode('utf8')[3:])).encode('utf8'))
 			else:
 				self.sendLine(world.process_command(line.decode('utf8'),self.username,self.factory,self.username).encode('utf8'))
-		if self.state=="USERNAME":
-			self.username=line.decode('utf8')
-			self.sendLine(b'Welcome, %s!' % self.username.encode('utf8'))
-			for c in self.factory.clients:
-				if c!=self:
-					c.sendLine(b'%s has joined the game!' % self.username.encode('utf8'))
-			log("Client at %s gave username %s, logged in\n" % (self.peer,self.username))
-			new_player=libadventure.Player(self.username)
-			new_player.thing=self
-			self.player=new_player
-			world.add_player(new_player)
-			self.sendLine(world.process_command('look',self.username,self.factory).encode('utf8'))
-			self.state="PLAYING"
 		if self.state=="USERLOGIN1":
 			usercontrol_json=json.load(userfp)
 			userfp.seek(0)
@@ -100,7 +89,9 @@ class GameProtocol(basic.LineReceiver):
 				if x[u'username']==unicode(line.decode('utf8')):
 					self.username=x[u'username'.encode('utf8')]
 					self.password_correct=x[u'password']
+					log(self.password_correct+"\n")
 					self.i=i
+					self.username=line.decode('utf8')
 					self.sendLine(b'Password > ')
 					self.state="USERLOGIN2"
 					return
@@ -116,9 +107,21 @@ Enter your choice >
 			usercontrol_json=json.load(userfp)
 			userfp.seek(0)
 			data=usercontrol_json[u'logins']
-			if data[i][u'password']==self.password_correct:
+			if line.decode('utf8')==self.password_correct:
 				self.sendLine(b"Login sucessful. Please press enter to continue.")
 				self.state="PLAYING"
+				self.sendLine(b'Welcome, %s!' % self.username.encode('utf8'))
+				for c in self.factory.clients:
+					if c!=self:
+						c.sendLine(b'%s has joined the game!' % self.username.encode('utf8'))
+				log("Client at %s gave username %s, logged in\n" % (self.peer,self.username))
+				new_player=libadventure.Player(self.username)
+				new_player.thing=self
+				self.player=new_player
+				world.add_player(new_player)
+				self.sendLine(world.process_command('look',self.username,self.factory).encode('utf8'))
+				self.state="PLAYING"
+				return
 			else:
 				self.sendLine(b"Bad password")
 				self.state="MENU"
