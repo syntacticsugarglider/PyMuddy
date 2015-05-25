@@ -137,7 +137,7 @@ class Room:
 			for line in self.fp.readlines():
 				for datatype in datatypes:
 					if line[0:len(datatype[0])-1]==datatype[0]:
-						if datatype!=:"contents":
+						if datatype!="contents":
 							datatype[1]=line[len(datatype):]
 						else:
 							for x in line[len(datatype):].split():
