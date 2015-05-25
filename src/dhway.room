@@ -1,4 +1,5 @@
 name Dark Hallway
-appearance You are in a dark hallway that leads east-to-west. It opens on a lit door to the east and continues into darkness on the west.
+appearance You are in a dark hallway that leads east-to-west. It opens on a lit door to the east and continues into darkness on the west. There is a low crawlway to the north.
 east Spawn
 west Telegate
+north Darkness

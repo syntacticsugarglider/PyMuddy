@@ -30,6 +30,7 @@ class World:
 			if c.player.name==playername and c.player.name!=player2:
 				c.sendLine(text.encode('utf8'))
 	def process_command(self,command,playername,factory=None,player2=None):
+		print(self.rooms)
 		player=self.players[playername]
 		extra=""
 		if command=="look" or command=="l":
