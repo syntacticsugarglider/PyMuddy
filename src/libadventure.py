@@ -30,7 +30,6 @@ class World:
 			if c.player.name==playername and c.player.name!=player2:
 				c.sendLine(text.encode('utf8'))
 	def process_command(self,command,playername,factory=None,player2=None):
-		print(self.rooms)
 		player=self.players[playername]
 		extra=""
 		if command=="look" or command=="l":
@@ -142,7 +141,7 @@ class Room:
 				for datatype in datatypes:
 					if line[0:len(datatype[0])]==datatype[0]:
 						if datatype!="contents":
-							datatype[1](line[len(datatype)+3:].strip("\n"))
+							datatype[1](line[len(datatype[0])+1:].strip("\n"))
 						else:
 							for x in line[len(datatype):].split():
 								item=libitems.Item(x)
@@ -160,16 +159,28 @@ class Room:
 	def set_3(self,x):
 		self.contents=x
 	def set_4(self,x):
+		if x[0]==" ":
+			x=x[1:]
 		self.east=x
 	def set_5(self,x):
+		if x[0]==" ":
+			x=x[1:]
 		self.north=x
 	def set_6(self,x):
+		if x[0]==" ":
+			x=x[1:]
 		self.south=x
 	def set_7(self,x):
+		if x[0]==" ":
+			x=x[1:]
 		self.west=x
 	def set_8(self,x):
+		if x[0]==" ":
+			x=x[1:]
 		self.up=x
 	def set_9(self,x):
+		if x[0]==" ":
+			x=x[1:]
 		self.down=x				
 
 class Player:
