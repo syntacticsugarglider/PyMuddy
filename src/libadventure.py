@@ -27,13 +27,16 @@ class World:
 	def remove_player(self,playername):
 		del self.players[playername]
 	def saytoplayer(self,playername,text,factory,player2):
-		for c in factory.clients:
-			if c.player.name==playername and c.player.name!=player2:
-				c.sendLine(text.encode('utf8'))
+		try:
+			for c in factory.clients:
+				if c.player.name==playername and c.player.name!=player2:
+					c.sendLine(text.encode('utf8'))
+		except:
+			pass
 	def process_command(self,command,playername,factory=None,player2=None):
 		player=self.players[playername]
 		extra=""
-		command=command.lower()	
+		command=command.lower()
 		if command[0:2]=="x " or command[0:8]=="examine ":
 			if command[0:2]=="x ":
 				name=command[2:].strip("\n").split()

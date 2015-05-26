@@ -133,6 +133,9 @@ Enter your choice (1,2) >\r
 				self.player=new_player
 				world.add_player(new_player)
 				self.sendLine(world.process_command('look',self.username,self.factory).encode('utf8'))
+				for key,value in world.players.iteritems():
+					del world.players[key]
+					world.players[key.encode('utf8')]=value.encode('utf8')
 				self.state="PLAYING"
 				return
 			else:
