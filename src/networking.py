@@ -15,6 +15,7 @@ log("Done!\n")
 log("Loading game libraries...\n")
 import libadventure
 import libgameloader
+import libitems
 log("Done!\n")
 log("Loading json...\n")
 import json
@@ -25,7 +26,7 @@ usercontrol_json=json.load(userfp)
 userfp.seek(0)
 print(usercontrol_json)
 log("Done!\n")
-room1=libadventure.Room("Spawn","You are in a plain nondescript room with a single bare lightbulb hanging from the ceiling. A dark and forbidding hallway leads west out of the room.",west="Dark Hallway")
+room1=libadventure.Room("Spawn","You are in a plain nondescript room with a single bare lightbulb hanging from the ceiling. A dark and forbidding hallway leads west out of the room.",west="Dark Hallway",contents={"a nasty-looking stiletto knife":libitems.Item("a nasty-looking stiletto knife","A well-crafted but nasty-looking blade with an ivory handle. It is about five inches long, very thin, and tapers to a wickedly sharp point.",properties={"type":"weapon","stance":"dagger","damage":"10"})})
 world=libadventure.World(room1)
 roomloader=libgameloader.RoomLoader("rooms.list",world)
 class GameProtocol(basic.LineReceiver):

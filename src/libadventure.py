@@ -32,6 +32,16 @@ class World:
 	def process_command(self,command,playername,factory=None,player2=None):
 		player=self.players[playername]
 		extra=""
+		command=command.lower()
+		if command[0:2]=="x " or command[0:8]=="examine ":
+			if command[0:2]=="x ":
+				name=command[2:].strip("\n").split()
+			if command[0:8]=="examine ":
+				name=command[8:].strip("\n").split()
+			for key,value in player.room.contents.iteritems():
+				for x in name:
+					if x in key:
+						return("Examining %s - %s" % (key,value.longdescription))
 		if command=="look" or command=="l":
 			for key,value in player.room.contents.iteritems():
 				extra+="\nYou can also see a "+key+" here"
