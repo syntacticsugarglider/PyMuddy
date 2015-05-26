@@ -4,6 +4,7 @@ import libinventory
 import libitems
 from datetime import datetime
 import sys
+#Cthulhu was here	
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
 	sys.stdout.write(text2)
@@ -32,13 +33,17 @@ class World:
 	def process_command(self,command,playername,factory=None,player2=None):
 		player=self.players[playername]
 		extra=""
-		command=command.lower()
+		command=command.lower()	
 		if command[0:2]=="x " or command[0:8]=="examine ":
 			if command[0:2]=="x ":
 				name=command[2:].strip("\n").split()
 			if command[0:8]=="examine ":
 				name=command[8:].strip("\n").split()
 			for key,value in player.room.contents.iteritems():
+				for x in name:
+					if x in key:
+						return("Examining %s - %s" % (key,value.longdescription))
+			for key,value in player.inventory.items.iteritems():
 				for x in name:
 					if x in key:
 						return("Examining %s - %s" % (key,value.longdescription))
@@ -150,14 +155,35 @@ class World:
 			else:
 				return "You can't go that way!"
 		elif command=="xyzzy":
-			return("Honestly? Really? Are you actually saying that? Yes you are.")
+			return("Honestly? Really? Are you actually saying that? Yes you are.\a")
+		elif command[0:5]=="stab " or command[0:5]=="kill ":
+			name=command[5:].strip("\n")
+			if name in self.players.keys() or name=="me":
+				pass
+			else:
+				return "You can't see any such thing to stab!"
+			if 'a nasty-looking stiletto knife' in player.inventory.items.keys():
+				pass
+			else:
+				return "You don't have anything to stab with!"
+			if name=="me":
+				name=player.name
+				playername2=""
+			else:
+				playername2=player.name
+			self.saytoplayer(name,"%s has stabbed you hard! Ouch!\a" % player.name,factory,playername2)
+			return "You stab %s hard. He bleeds. Ouch." % name
+		elif command=="stab":
+			return "Be specific as to what you want to stab!"
+		elif command=="beep":
+			return("\a")
 		else:
 			return "I'm not sure I understand you"
 class Room:
 	def __init__(self,name,appearance,contents={},fromfile=None,west=None,east=None,north=None,south=None,up=None,down=None):
 		self.appearance=appearance
 		self.name=name
-		self.contents=contents
+		self.contents={}
 		self.players={}
 		self.west=west
 		self.east=east
@@ -178,11 +204,12 @@ class Room:
 			for line in self.fp.readlines():
 				for datatype in datatypes:
 					if line[0:len(datatype[0])]==datatype[0]:
-						if datatype!="contents":
+						if datatype[0]!="contents":
 							datatype[1](line[len(datatype[0])+1:].strip("\n"))
 						else:
-							for x in line[len(datatype):].split():
+							for x in line[len(datatype[0]):].split():
 								item=libitems.Item(x)
+								log("Loading item %s" % x)
 								self.contents[item.name]=item
 			try:
 				self.fp.close()
