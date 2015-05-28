@@ -52,18 +52,17 @@ class World:
 						return("Examining %s - %s" % (key,value.longdescription))
 
 			return "You can see no such thing."
-
 		if command[0:4]=="get " or command[0:5]=="take " or command[0:5]=="grab ":
 			if command[0:4]=="get ":
 				name=command[4:].strip("\n").split()
 			if command[0:5]=="take " or command[0:5]=="grab ":
 				name=command[5:].strip("\n").split()
-				for key,value in player.room.contents.iteritems():
-					for x in name:
-						if x in key:
-							player.inventory.additem(key,value)
-							del player.room.contents[key]
-							return "Taken"
+			for key,value in player.room.contents.iteritems():
+				for x in name:
+					if x in key:
+						player.inventory.additem(key,value)
+						del player.room.contents[key]
+						return "Taken"
 			return "You can see no such thing!"
 		if command[0:5]=="drop ":
 			name=command[5:].strip("\n").split()
