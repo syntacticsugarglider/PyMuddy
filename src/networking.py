@@ -82,7 +82,11 @@ Enter your choice > \r
 					if c!=self:
 						c.sendLine(("%s>%s" % (self.username,line.decode('utf8')[3:])).encode('utf8'))
 			else:
-				self.sendLine(world.process_command(line.decode('utf8'),self.username,self.factory,self.username).encode('utf8'))
+				data=world.process_command(line.decode('utf8'),self.username,self.factory,self.username).encode('utf8')
+				if data=='#exit#':
+					self.loseConnection()
+					return
+				self.sendLine(data)
 		if self.state=="USERLOGIN1":
 			usercontrol_json=json.load(userfp)
 			userfp.seek(0)

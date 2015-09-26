@@ -158,6 +158,8 @@ class World:
 				return "You can't go that way!"
 		elif command=="xyzzy":
 			return("Honestly? Really? Are you actually saying that? Yes you are.\a")
+		elif command=='quit' or command=='exit':
+			return('#exit#')
 		elif command[0:5]=="stab " or command[0:5]=="kill ":
 			name=command[5:].strip("\n")
 			if name in self.players.keys() or name=="me":
