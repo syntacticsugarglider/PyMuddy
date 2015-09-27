@@ -35,6 +35,12 @@ class World:
 		except:
 			pass
 	def process_command(self,command,playername,factory=None,player2=None):
+		try:
+			command=command.decode('utf8')
+		except:
+			pass
+		command=str(command)
+		command_array=command.split()
 		player=self.players[playername]
 		extra=""
 		if self.state=='getting_num_items_grab':
@@ -157,6 +163,7 @@ class World:
 				data+='%sx %s\n' % (str(len(value)),value[0].shortdescription)
 			if data=="":
 				data='Your inventory is empty'
+			data+='Your health is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
 			return data
 
 		if command=="look" or command=="l":
@@ -245,27 +252,30 @@ class World:
 			return("Honestly? Really? Are you actually saying that? Yes you are.\a")
 		elif command=='quit' or command=='exit':
 			return('#exit#')
-		elif command[0:5]=="stab " or command[0:5]=="kill ":
-			name=command[5:].strip("\n")
-			if name in self.players.keys() or name=="me":
+		elif command_array[0]=='stab' or command_array[0]=='a' or command_array[0]=='kill' or command_array[0]=='attack':
+			print(command_array)
+			if len(command_array)<4:
+				return "You need to specify what to attack and what to attack with!"
+			if command_array[1] in self.players.keys():
 				pass
 			else:
-				return "You can't see any such thing to stab!"
-			if 'a nasty-looking stiletto knife' in player.inventory.items.keys():
+				return "You can't see any such person to stab!"
+			bleh=None
+			for key,value in player.inventory.items.iteritems():
+				if command_array[3] in key:
+					bleh=key
+			if bleh==None:
+				return "You don't have that thing!"
+			if player.inventory.items[bleh][0].properties['type']=='weapon':
 				pass
 			else:
-				return "You don't have anything to stab with!"
-			if name=="me":
-				name=player.name
-				playername2=""
-			else:
-				playername2=player.name
-			self.saytoplayer(name,"%s has stabbed you hard! Ouch!\a" % player.name,factory,playername2)
-			return "You stab %s hard. He bleeds. Ouch." % name
-		elif command=="stab":
-			return "Be specific as to what you want to stab!"
-		elif command=="beep":
-			return("\a")
+				return "That's a silly thing to stab with."
+			if not player.can_attack:
+				return "You are in no condition to attack!"
+			playername2=player.name
+			self.players[command_array[1]].take_damage(player.inventory.items[bleh][0].properties['damage'])
+			self.saytoplayer(command_array[1],"%s lunges at you with a %s! You lose %s life! You are now at %s life!\a" % (player.name,player.inventory.items[bleh][0].properties['stance'],player.inventory.items[bleh][0].properties['damage'],self.players[command_array[1]].health),factory,playername2)
+			return "You attack %s, dealing %s damage!" % (command_array[1],player.inventory.items[bleh][0].properties['damage'])
 		else:
 			return "I'm not sure I understand you"
 class Room:
@@ -346,5 +356,12 @@ class Room:
 
 class Player:
 	def __init__(self,name):
+		self.health=100
+		self.maxhealth=100
+		self.can_attack=True
 		self.inventory=libinventory.Inventory()
 		self.name=name
+	def take_damage(self,damage):
+		self.health-=int(damage)
+		if self.health<=0:
+			raise BaseException
