@@ -14,6 +14,7 @@ class World:
 		self.players={}
 		self.rooms[initialroom.name]=initialroom
 		self.spawn=self.rooms[initialroom.name]
+		self.state=''
 	def add_room(self,room):
 		self.rooms[room.name]=room
 	def add_player(self,player):
@@ -36,6 +37,60 @@ class World:
 	def process_command(self,command,playername,factory=None,player2=None):
 		player=self.players[playername]
 		extra=""
+		if self.state=='getting_num_items_grab':
+			try:
+				int(command)
+			except:
+				return "That's not a valid number!\n Please give a valid number!\n"
+			name=self.arbitrary_data_storage
+			for key,value in player.room.contents.iteritems():
+				for x in name:
+					if x in key:
+						if int(command)>len(value):
+							return "You can't see that many! Please give a smaller number!"
+						if int(command)!=0:
+							contents_item=True
+							try:
+								player.inventory.items[key]
+							except:
+								contents_item=False
+							if not contents_item:
+								player.inventory.items[key]=[]
+							player.inventory.items[key]+=value[0:int(command)]
+							if int(len(value))==int(command):
+								del player.room.contents[key]
+								self.state=''
+								return "Taken"
+							del player.room.contents[key][0:int(command)]
+						self.state=''
+						return "Taken"
+		if self.state=='getting_num_items_drop':
+			try:
+				int(command)
+			except:
+				return "That's not a valid number!\n Please give a valid number!\n"
+			name=self.arbitrary_data_storage
+			for key,value in player.inventory.items.iteritems():
+				for x in name:
+					if x in key:
+						if int(command)>len(value):
+							return "You can't see that many! Please give a smaller number!"
+						if int(command)!=0:
+							contents_item=True
+							try:
+								player.room.contents[key]
+							except:
+								contents_item=False
+							if not contents_item:
+								player.room.contents[key]=[]
+							player.room.contents[key]+=value[0:int(command)]
+							if int(len(value))==int(command):
+								del player.inventory.items[key]
+								self.state=''
+								return "Taken"
+							del player.inventory.items[key][0:int(command)]
+						self.state=''
+						return "Dropped"
 		command=command.lower()
 		if command[0:2]=="x " or command[0:8]=="examine ":
 			if command[0:2]=="x ":
@@ -60,7 +115,18 @@ class World:
 			for key,value in player.room.contents.iteritems():
 				for x in name:
 					if x in key:
-						player.inventory.additem(key,value)
+						if len(value)>1 and self.state!='getting_num_items_grab':
+							self.state='getting_num_items_grab'
+							self.arbitrary_data_storage=name
+							return "How many do you want to %s?" % command.split()[0]
+						contents_item=True
+						try:
+							player.inventory.items[key]
+						except:
+							contents_item=False
+						if not contents_item:
+							player.inventory.items[key]=[]
+						player.inventory.items[key].append(value[0])
 						del player.room.contents[key]
 						return "Taken"
 			return "You can see no such thing!"
@@ -69,17 +135,36 @@ class World:
 			for key,value in player.inventory.items.iteritems():
 					for x in name:
 						if x in key:
+							if len(value)>1:
+								self.state='getting_num_items_drop'
+								self.arbitrary_data_storage=name
+								return "How many do you want to %s?" % command.split()[0]
+							contents_item=True
+							try:
+								player.room.contents[key]
+							except:
+								contents_item=False
+							if not contents_item:
+								player.room.contents[key]=[]
+							player.room.contents[key].append(value[0])
 							del player.inventory.items[key]
-							player.room.contents[key]=value
 							return "Dropped"
 			return "You aren't carrying any such thing!"
 
 		if command=="i" or command=="inventory":
-			return str(player.inventory.items.keys())
+			data=''
+			for key,value in player.inventory.items.iteritems():
+				data+='%sx %s\n' % (str(len(value)),value[0].shortdescription)
+			if data=="":
+				data='Your inventory is empty'
+			return data
 
 		if command=="look" or command=="l":
 			for key,value in player.room.contents.iteritems():
-				extra+="\nYou can also see a "+key+" here"
+				if len(value)==1:
+					extra+="\nYou can also see a "+value[0].shortdescription+" here"
+				else:
+					extra+="\nYou can also see %s %ss here" % (str(len(value)),value[0].shortdescription)
 			for key,value in player.room.players.iteritems():
 				if key!=player.name:
 					extra+="\n%s is here too!" % key
@@ -214,7 +299,14 @@ class Room:
 							for x in line[len(datatype[0]):].split():
 								item=libitems.Item(x)
 								log("Loading item %s" % x)
-								self.contents[item.name]=item
+								contents_item=True
+								try:
+									self.contents[item.name]
+								except:
+									contents_item=False
+								if not contents_item:
+									self.contents[item.name]=[]
+								self.contents[item.name].append(item)
 			try:
 				self.fp.close()
 				del self.fp
