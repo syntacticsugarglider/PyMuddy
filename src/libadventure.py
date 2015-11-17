@@ -7,11 +7,30 @@ import sys
 class CommandParser:
 	def __init__(self,world):
 		self.commands={}
-		self.world=world
+		self.environmentVariables={'commandnotfoundmessages':['I\'m not sure I understand you.']}
+		self.referenceArguments={'world':world}
 	def addCommand(self,name,function,properties_list):
-		pass
+		self.commands[name]=(properties_list,function)
+	def setEnv(self,envname,value):
+		self.environmentVariables[envname]=value
+	def registerReferenceArgument(self,name,argument):
+		self.referenceArguments[name]=argument
 	def parseCommand(self,input,player):
-		pass
+		splits=input.strip('\n\r').split()
+		try:
+			command=self.commands[splits[0]][0]
+			properties=self.commands[splits[0]][1]
+			if 'args' in properties:
+				arguments_required=properties['args']
+				argument_list={}
+				for argument_name in arguments_required:
+					if argument_name=='current_player':
+						argument_list['current_player']=player
+					else:
+						argument_list[argument_name]=self.referenceArguments[argument_name])
+			command(splits[1:],**argument_list)
+		except KeyError:
+			return self.enviromentVariables['commandnotfoundmessages'][0]
 #Cthulhu was here
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
