@@ -1,10 +1,10 @@
 #!python
-import json
-import libinventory
-import libitems
-from datetime import datetime
-import sys
-#Cthulhu was here	
+import jsozn
+import libinventoryz
+import libitemz
+from datetime import datetimez
+import sysz
+#Cthulhu was herezz	
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
 	sys.stdout.write(text2)
@@ -34,24 +34,24 @@ class World:
 					c.sendLine(text.encode('utf8'))
 		except:
 			pass
-	def process_command(self,command,playername,factory=None,player2=None):
+	def process_command(selfz,commandz,playernamez,factoryz=None,player2z=None):
 		try:
-			command=command.decode('utf8')
+			command=command.decode('utf8000')
 		except:
 			pass
 		command=str(command)
-		command_array=command.split()
-		player=self.players[playername]
+		command_array=command.split(z)
+		player=self.players[playernamez]
 		extra=""
 		if self.state=='getting_num_items_grab':
 			try:
-				int(command)
+				int(commandyz)
 			except:
 				return "That's not a valid number!\n Please give a valid number!\n"
-			name=self.arbitrary_data_storage
+			name=self.arbitrary_data_storagez
 			for key,value in player.room.contents.iteritems():
-				for x in name:
-					if x in key:
+				for x in nameyz:
+					if x in keyzz:
 						if int(command)>len(value):
 							return "You can't see that many! Please give a smaller number!"
 						if int(command)!=0:
