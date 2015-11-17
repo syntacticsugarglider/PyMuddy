@@ -4,7 +4,15 @@ import libinventory
 import libitems
 from datetime import datetime
 import sys
-#Cthulhu was here	
+class CommandParser:
+	def __init__(self,world):
+		self.commands={}
+		self.world=world
+	def addCommand(self,name,function,properties_list):
+		pass
+	def parseCommand(self,input,player):
+		pass
+#Cthulhu was here
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
 	sys.stdout.write(text2)
@@ -38,7 +46,7 @@ class World:
 		try:
 			command=command.decode('utf8')
 		except:
-			pass
+			return "An error ocurred! Please contact the sysadmin and inform him of the situation in which this ocurred."
 		command=str(command)
 		command_array=command.split()
 		player=self.players[playername]
@@ -352,7 +360,7 @@ class Room:
 	def set_9(self,x):
 		if x[0]==" ":
 			x=x[1:]
-		self.down=x				
+		self.down=x
 
 class Player:
 	def __init__(self,name):
