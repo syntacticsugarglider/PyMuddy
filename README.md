@@ -3,7 +3,7 @@ This is a pure-python MUD engine/server
 
 The only dependency is twisted and its sub-dependencies.
 
-You don't need a MUD client to connect to it, PuTTY on Windows and the telnet command on Mac OSX and Linux should work.
+You don't need a MUD client to connect to it, KiTTY/PuTTY on Windows and the telnet command on Mac OSX and Linux should work.
 
 This is a work in progress, but it's going to be a fully-finished game at some point.
 
