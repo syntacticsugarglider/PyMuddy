@@ -4,6 +4,7 @@ import libinventory
 import libitems
 from datetime import datetime
 import sys
+import random
 #Cthulhu was here	
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
@@ -113,7 +114,7 @@ class World:
 						return("Examining %s - %s" % (key,value.longdescription))
 
 			return "You can see no such thing."
-		if command[0:4]=="get " or command[0:5]=="take " or command[0:5]=="grab ":
+		if command[0:4]=="get " or command[0:5]=="take " or command[0:5]=="grab " or command[0:2]=="t ":
 			if command[0:4]=="get ":
 				name=command[4:].strip("\n").split()
 			if command[0:5]=="take " or command[0:5]=="grab ":
