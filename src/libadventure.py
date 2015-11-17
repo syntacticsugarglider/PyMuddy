@@ -4,8 +4,7 @@ import libinventory
 import libitems
 from datetime import datetime
 import sys
-#Cthulhu was here
-#Lalex killed izzy in this code
+#Cthulhu was here	
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
 	sys.stdout.write(text2)
@@ -156,17 +155,14 @@ class World:
 							player.room.contents[key].append(value[0])
 							del player.inventory.items[key]
 							return "Dropped"
-			return "You aren't carrying any such thingz!"
+			return "You aren't carrying any such thing!"
 
-		if command=="i" or command=="inventory" or command=="thingz":
+		if command=="i" or command=="inventory":
 			data=''
 			for key,value in player.inventory.items.iteritems():
 				data+='%sx %s\n' % (str(len(value)),value[0].shortdescription)
 			if data=="":
-                                if command=="i" or command=="inventory":
-                                        data='Your inventory is empty'
-                                else:
-                                        data='You have no thingz'
+				data='Your inventory is empty'
 			data+='Your health is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
 			return data
 
@@ -252,7 +248,7 @@ class World:
 				return self.process_command('look',playername)
 			else:
 				return "You can't go that way!"
-		elif command=="xyzzy" or command=="iggy":
+		elif command=="xyzzy":
 			return("Honestly? Really? Are you actually saying that? Yes you are.\a")
 		elif command=='quit' or command=='exit':
 			return('#exit#')
