@@ -4,64 +4,7 @@ import libinventory
 import libitems
 from datetime import datetime
 import sys
-#Cthulhu was here
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-
+#Cthulhu was here	
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
 	sys.stdout.write(text2)
@@ -91,15 +34,15 @@ class World:
 					c.sendLine(text.encode('utf8'))
 		except:
 			pass
-	def process_command(selfz,commandz,playernamez,factory=None,player2=None):
+	def process_command(self,command,playername,factory=None,player2=None):
 		try:
-			command=command.decode('utf8z')
+			command=command.decode('utf8')
 		except:
 			pass
-		commandz=str(commandz)
+		command=str(command)
 		command_array=command.split()
-		playerz=self.players[playername]
-		extraz=""
+		player=self.players[playername]
+		extra=""
 		if self.state=='getting_num_items_grab':
 			try:
 				int(command)
