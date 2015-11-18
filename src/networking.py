@@ -207,5 +207,5 @@ class GameFactory(protocol.Factory):
 	def buildProtocol(self, addr):
 		return GameProtocol(self)
 
-endpoints.serverFromString(reactor, "tcp:1234").listen(GameFactory())
+endpoints.serverFromString(reactor, "tcp:1337").listen(GameFactory())
 reactor.run()
