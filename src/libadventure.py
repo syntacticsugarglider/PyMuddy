@@ -76,7 +76,7 @@ class World:
 			return "An error ocurred! Please contact the sysadmin and inform him of the situation in which this ocurred."
 		command=str(command)
 		if command=='':
-			return
+			return ''
 		command_array=command.split()
 		player=self.players[playername]
 		self.commandParser.parseCommand(command,player)
