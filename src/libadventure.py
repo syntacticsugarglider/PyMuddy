@@ -9,8 +9,8 @@ class CommandParser:
 		self.commands={}
 		self.environmentVariables={'commandnotfoundmessages':['I\'m not sure I understand you.']}
 		self.referenceArguments={'world':world,'commandprocessor':self}
-	def addCommand(self,name,function,properties_list):
-		self.commands[name]=(properties_list,function)
+	def addCommand(self,name,function,properties_dict):
+		self.commands[name]=(function,properties_dict)
 	def setEnv(self,envname,value):
 		self.environmentVariables[envname]=value
 	def registerReferenceArgument(self,name,argument):
