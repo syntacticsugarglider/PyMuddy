@@ -8,13 +8,15 @@ class CommandParser:
 	def __init__(self,world):
 		self.commands={}
 		self.environmentVariables={'commandnotfoundmessages':['I\'m not sure I understand you.']}
-		self.referenceArguments={'world':world}
+		self.referenceArguments={'world':world,'commandprocessor':self}
 	def addCommand(self,name,function,properties_list):
 		self.commands[name]=(properties_list,function)
 	def setEnv(self,envname,value):
 		self.environmentVariables[envname]=value
 	def registerReferenceArgument(self,name,argument):
 		self.referenceArguments[name]=argument
+	def registerCommandAlias(self,origin,alias):
+		self.commands[alias]=self.commands[origin]
 	def parseCommand(self,input,player):
 		splits=input.strip('\n\r').split()
 		try:
@@ -37,11 +39,17 @@ def log(text):
 	sys.stdout.write(text2)
 class World:
 	def __init__(self,initialroom):
+		self.commandParser=CommandParser(self)
 		self.rooms={}
 		self.players={}
 		self.rooms[initialroom.name]=initialroom
 		self.spawn=self.rooms[initialroom.name]
 		self.state=''
+		self.registerCommands()
+	def registerCommands(self):
+		def takeCommand(line,world=None,commandprocessor=None):
+			print(line,world,commandprocessor)
+		self.commandParser.addCommand('phish',takeCommand,{'args':['world','commandprocessor']})
 	def add_room(self,room):
 		self.rooms[room.name]=room
 	def add_player(self,player):
@@ -69,6 +77,7 @@ class World:
 		command=str(command)
 		command_array=command.split()
 		player=self.players[playername]
+		self.commandParser.parseCommand(command,player)
 		extra=""
 		if self.state=='getting_num_items_grab':
 			try:
