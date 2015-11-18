@@ -32,7 +32,7 @@ class CommandParser:
 						argument_list[argument_name]=self.referenceArguments[argument_name]
 			command(splits[1:],**argument_list)
 		except KeyError:
-			return self.enviromentVariables['commandnotfoundmessages'][0]
+			return self.environmentVariables['commandnotfoundmessages'][0]
 #Cthulhu was here
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
