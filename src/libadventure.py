@@ -30,9 +30,9 @@ class CommandParser:
 						argument_list['current_player']=player
 					else:
 						argument_list[argument_name]=self.referenceArguments[argument_name]
-			command(splits[1:],**argument_list)
+			return(True,command(splits[1:],**argument_list))
 		except KeyError:
-			return self.environmentVariables['commandnotfoundmessages'][0]
+			return (False,self.environmentVariables['commandnotfoundmessages'][0])
 #Cthulhu was here
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
@@ -49,6 +49,7 @@ class World:
 	def registerCommands(self):
 		def takeCommand(line,world=None,commandprocessor=None):
 			print(line,world,commandprocessor)
+			return('YOU ARE A PHISH')
 		self.commandParser.addCommand('phish',takeCommand,{'args':['world','commandprocessor']})
 	def add_room(self,room):
 		self.rooms[room.name]=room
@@ -79,7 +80,11 @@ class World:
 			return ''
 		command_array=command.split()
 		player=self.players[playername]
-		self.commandParser.parseCommand(command,player)
+		parsing_response=self.commandParser.parseCommand(command,player)
+		if parsing_response[0]:
+			return parsing_response[1]
+		else:
+			pass
 		extra=""
 		if self.state=='getting_num_items_grab':
 			try:
