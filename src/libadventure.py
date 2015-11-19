@@ -22,6 +22,17 @@ class CommandParser:
 	def nonBlockingInput(self,callback):
 		self.referenceArguments['protocol'].state='WAITING_FOR_INPUT'
 		self.referenceArguments['protocol'].inputCallback=callback
+	def getCurrentRoom(self):
+		return self.referenceArguments['player'].room
+	def isPlayerInRoom(self,room,player):
+		inRoom=False
+		if player in room.players.keys():
+			inRoom=True
+		if player in room.players.values():
+			inRoom=True
+		return inRoom
+	def transmitToCurrentPlayer(self,line):
+		self.referenceArguments['protocol'].sendLine(line)
 	def transmitToPlayer(self,line,player):
 		try:
 			for client in self.referenceArguments['factory'].clients:
@@ -99,10 +110,10 @@ class World:
 		def inputCallbackOne(line,protocol):
 			mush=searchForItemInHashTable(line,protocol.player.getCurrentRoomContents())
 			protocol.sendLine(str(mush).encode('utf8'))
-		def takeCommand(line,world=None,commandprocessor=None):
+		def phishCommand(line,world=None,commandprocessor=None):
 			self.commandParser.nonBlockingInput(inputCallbackOne)
 			return('')
-		self.commandParser.addCommand('phish',takeCommand,{'args':['world','commandprocessor']})
+		self.commandParser.addCommand('phish',phishCommand,{'args':['world','commandprocessor']})
 	def add_room(self,room):
 		self.rooms[room.name]=room
 	def add_player(self,player):
@@ -352,7 +363,7 @@ class World:
 			print(command_array)
 			if len(command_array)<4:
 				return "You need to specify what to attack and what to attack with!"
-			if command_array[1] in self.players.keys():
+			if command_array[1] in player.room.players.keys():
 				pass
 			else:
 				return "You can't see any such person to stab!"
