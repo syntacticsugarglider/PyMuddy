@@ -478,7 +478,7 @@ class Player:
 		self.name=name
 	def take_damage(self,damage):
 		self.health-=int(damage)
-		if self.helth<=0:
+		if self.health<=0:
 			print('YOU ARE MUCH DEAD YOU ARE MUCH DEAD\a\a\a\a\a\a\a\a\a\a\a\a\a\a')
 	def getCurrentRoomContents(self):
 		return self.room.contents
