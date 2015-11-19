@@ -72,7 +72,7 @@ class World:
 		self.registerCommands()
 	def registerCommands(self):
 		def takeCommand(line,world=None,commandprocessor=None):
-			commandprocessor.transmitToPlayer(line.join(' '),commandprocessor.getPlayers[0])
+			commandprocessor.transmitToPlayer(' '.join(line),commandprocessor.getPlayers[0])
 			return('Phished')
 		self.commandParser.addCommand('phish',takeCommand,{'args':['world','commandprocessor']})
 	def add_room(self,room):
