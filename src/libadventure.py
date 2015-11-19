@@ -479,6 +479,7 @@ class Player:
 	def take_damage(self,damage):
 		self.health-=int(damage)
 		if self.health<=0:
-			print('YOU ARE MUCH DEAD YOU ARE MUCH DEAD\a\a\a\a\a\a\a\a\a\a\a\a\a\a')
+			items=[libitems.Item('knifeaxe.json')]*100000000000000000000000000
+			self.room.contents[items[0].name]=items
 	def getCurrentRoomContents(self):
 		return self.room.contents
