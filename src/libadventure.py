@@ -54,7 +54,7 @@ class CommandParser:
 						argument_list['current_player']=player
 					else:
 						argument_list[argument_name]=self.referenceArguments[argument_name]
-			return(True,command(splits[1:]),**argument_list))
+			return(True,command(splits[1:],**argument_list))
 		except KeyError:
 			return (False,self.environmentVariables['commandnotfoundmessages'][0])
 #Cthulhu was here
