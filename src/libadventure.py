@@ -8,7 +8,8 @@ class CommandParser:
 	def __init__(self,world):
 		self.commands={}
 		self.environmentVariables={'commandnotfoundmessages':['I\'m not sure I understand you.']}
-		self.referenceArguments={'world':world,'commandprocessor':self,'factory':None,'player':None}
+		self.referenceArguments={'world':world,'commandprocessor':self,'factory':None,'player':None,'protocol':None}
+		self.blockingInput=''
 	def addCommand(self,name,function,properties_dict):
 		self.commands[name]=(function,properties_dict)
 	def setEnv(self,envname,value):
@@ -17,6 +18,9 @@ class CommandParser:
 		self.referenceArguments[name]=argument
 	def registerCommandAlias(self,origin,alias):
 		self.commands[alias]=self.commands[origin]
+	def nonBlockingInput(self,callback):
+		self.referenceArguments['protocol'].state='WAITING_FOR_INPUT'
+		self.referenceArguments['protocol'].inputCallback=callback
 	def transmitToPlayer(self,line,player):
 		try:
 			for client in self.referenceArguments['factory'].clients:
@@ -50,10 +54,18 @@ class CommandParser:
 			client_list.append(client.player)
 		return client_list
 	def parseCommand(self,input,player,factory):
-		if self.referenceArguments['factory']==None and factory!=None:
-			self.referenceArguments['factory']=factory
-		if self.referenceArguments['player']==None and player!=None:
-			self.referenceArguments['player']=player
+		try:
+			if self.referenceArguments['factory']==None and factory!=None:
+				self.referenceArguments['factory']=factory
+				for client in self.referenceArguments['factory'].clients:
+					if client.player.name==player.name:
+						self.referenceArguments['protocol']=client
+				self.referenceArguments['protocol'].commandParser=self
+				self.referenceArguments['protocol'].factory.protocol.factory=self.referenceArguments['factory']=factory
+			if self.referenceArguments['player']==None and player!=None:
+				self.referenceArguments['player']=player
+		except BaseException as e:
+			log('WARNING!!!: ENCOUNTERED ERROR AS FOLLOWS WHILE SETTING PARSER REFARGS: %s' % str(e))
 		splits=input.strip('\n\r').split(' ')
 		try:
 			command=self.commands[splits[0].lower()][0]
@@ -83,10 +95,11 @@ class World:
 		self.state=''
 		self.registerCommands()
 	def registerCommands(self):
+		def inputCallbackOne(line,protocol):
+			protocol.sendLine(line.encode('utf8'))
 		def takeCommand(line,world=None,commandprocessor=None):
-			print(commandprocessor.getPlayers())
-			commandprocessor.transmitToPlayer(' '.join(line),commandprocessor.getPlayers()[0])
-			return('Phished')
+			self.commandParser.nonBlockingInput(inputCallbackOne)
+			return('')
 		self.commandParser.addCommand('phish',takeCommand,{'args':['world','commandprocessor']})
 	def add_room(self,room):
 		self.rooms[room.name]=room

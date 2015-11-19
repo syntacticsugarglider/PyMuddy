@@ -65,7 +65,12 @@ Enter your choice > \r
 				if c!=self:
 					c.sendLine(text.encode('utf8'))
 	def lineReceived(self, line):
-		log("Recieved line \n%s\n from client %s" % (line.decode('utf8'),str(self.transport.getPeer())))
+		log("Recieved line \n%s\n from client %s while in state %s" % (line.decode('utf8'),str(self.transport.getPeer()),self.state))
+		if self.state=='WAITING_FOR_INPUT':
+			log('RECIEVED CALLBACK LINE %s' % line.decode('utf8'))
+			self.inputCallback(line.decode('utf8'),self)
+			self.state='PLAYING'
+			return
 		if self.state=="MENU":
 			if line.decode('utf8')=="1":
 				self.sendLine("Username > ")
@@ -205,7 +210,8 @@ class GameFactory(protocol.Factory):
 		self.clients = set()
 
 	def buildProtocol(self, addr):
-		return GameProtocol(self)
+		self.protocol=GameProtocol(self)
+		return self.protocol
 
 endpoints.serverFromString(reactor, "tcp:1337").listen(GameFactory())
 reactor.run()
