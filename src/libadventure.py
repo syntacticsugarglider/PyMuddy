@@ -8,7 +8,7 @@ class CommandParser:
 	def __init__(self,world):
 		self.commands={}
 		self.environmentVariables={'commandnotfoundmessages':['I\'m not sure I understand you.']}
-		self.referenceArguments={'world':world,'commandprocessor':self}
+		self.referenceArguments={'world':world,'commandprocessor':self,'factory':None}
 	def addCommand(self,name,function,properties_dict):
 		self.commands[name]=(function,properties_dict)
 	def setEnv(self,envname,value):
@@ -17,7 +17,31 @@ class CommandParser:
 		self.referenceArguments[name]=argument
 	def registerCommandAlias(self,origin,alias):
 		self.commands[alias]=self.commands[origin]
-	def parseCommand(self,input,player):
+	def transmitToPlayer(self,line,playername):
+		try:
+			for client in self.referenceArguments['factory'].clients:
+				if client.player.name==playername and client.player.name!=player2:
+					client.sendLine(text.encode('utf8'))
+		except:
+			pass
+	def transmitToEveryone(self,line,transmittoself):
+		try:
+			for client in self.referenceArguments['factory'].clients:
+				if factory==client and not transmittoself:
+					pass
+				else:
+					client.sendLine(text.encode('utf8'))
+		except:
+			pass
+	def getPlayers(self):
+		try:
+			self.referenceArguments['factory'].clients
+		except NameError:
+			return []
+		return self.referenceArguments['factory'].clients
+	def parseCommand(self,input,player,factory):
+		if self.referenceArguments['factory']==None and factory!=None:
+			self.referenceArguments['factory']=factory
 		splits=input.strip('\n\r').split()
 		try:
 			command=self.commands[splits[0]][0]
@@ -48,8 +72,8 @@ class World:
 		self.registerCommands()
 	def registerCommands(self):
 		def takeCommand(line,world=None,commandprocessor=None):
-			print(line,world,commandprocessor)
-			return('YOU ARE A PHISH')
+			commandprocessor.transmitToPlayer(line.join(' '),commandprocessor.getPlayers[0])
+			return('Phished')
 		self.commandParser.addCommand('phish',takeCommand,{'args':['world','commandprocessor']})
 	def add_room(self,room):
 		self.rooms[room.name]=room
@@ -71,6 +95,7 @@ class World:
 		except:
 			pass
 	def process_command(self,command,playername,factory=None,player2=None):
+		factory=factory
 		try:
 			command=command.decode('utf8')
 		except:
@@ -80,7 +105,7 @@ class World:
 			return ''
 		command_array=command.split()
 		player=self.players[playername]
-		parsing_response=self.commandParser.parseCommand(command,player)
+		parsing_response=self.commandParser.parseCommand(command,player,factory)
 		if parsing_response[0]:
 			return parsing_response[1]
 		else:
