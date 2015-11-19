@@ -42,10 +42,10 @@ class CommandParser:
 	def parseCommand(self,input,player,factory):
 		if self.referenceArguments['factory']==None and factory!=None:
 			self.referenceArguments['factory']=factory
-		splits=input.strip('\n\r').split()
+		splits=input.strip('\n\r').split(' ')
 		try:
-			command=self.commands[splits[0]][0]
-			properties=self.commands[splits[0]][1]
+			command=self.commands[splits[0].lower()][0]
+			properties=self.commands[splits[0].lower()][1]
 			if 'args' in properties:
 				arguments_required=properties['args']
 				argument_list={}
@@ -72,7 +72,7 @@ class World:
 		self.registerCommands()
 	def registerCommands(self):
 		def takeCommand(line,world=None,commandprocessor=None):
-			commandprocessor.transmitToPlayer(' '.join(line),commandprocessor.getPlayers[0])
+			commandprocessor.transmitToPlayer(' '.join(line),commandprocessor.getPlayers(0))
 			return('Phished')
 		self.commandParser.addCommand('phish',takeCommand,{'args':['world','commandprocessor']})
 	def add_room(self,room):
