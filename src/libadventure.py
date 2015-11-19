@@ -8,7 +8,7 @@ class CommandParser:
 	def __init__(self,world):
 		self.commands={}
 		self.environmentVariables={'commandnotfoundmessages':['I\'m not sure I understand you.']}
-		self.referenceArguments={'world':world,'commandprocessor':self,'factory':None}
+		self.referenceArguments={'world':world,'commandprocessor':self,'factory':None,'player':None}
 	def addCommand(self,name,function,properties_dict):
 		self.commands[name]=(function,properties_dict)
 	def setEnv(self,envname,value):
@@ -17,13 +17,13 @@ class CommandParser:
 		self.referenceArguments[name]=argument
 	def registerCommandAlias(self,origin,alias):
 		self.commands[alias]=self.commands[origin]
-	def transmitToPlayer(self,line,playername):
+	def transmitToPlayer(self,line,player):
 		try:
 			for client in self.referenceArguments['factory'].clients:
-				if client.player.name==playername and client.player.name!=player2:
-					client.sendLine(text.encode('utf8'))
-		except:
-			pass
+				if client.player.name==player.name:
+					client.sendLine(line.encode('utf8'))
+		except KeyError:
+			return False
 	def transmitToEveryone(self,line,transmittoself):
 		try:
 			for client in self.referenceArguments['factory'].clients:
@@ -31,17 +31,29 @@ class CommandParser:
 					pass
 				else:
 					client.sendLine(text.encode('utf8'))
-		except:
-			pass
+			return True
+		except KeyError:
+			return False
+	def getNetworkClients(self):
+		try:
+			self.referenceArguments['factory'].clients
+		except NameError:
+			return []
+		return list(self.referenceArguments['factory'].clients)
 	def getPlayers(self):
 		try:
 			self.referenceArguments['factory'].clients
 		except NameError:
 			return []
-		return self.referenceArguments['factory'].clients
+		client_list=[]
+		for client in list(self.referenceArguments['factory'].clients):
+			client_list.append(client.player)
+		return client_list
 	def parseCommand(self,input,player,factory):
 		if self.referenceArguments['factory']==None and factory!=None:
 			self.referenceArguments['factory']=factory
+		if self.referenceArguments['player']==None and player!=None:
+			self.referenceArguments['player']=player
 		splits=input.strip('\n\r').split(' ')
 		try:
 			command=self.commands[splits[0].lower()][0]
@@ -72,6 +84,7 @@ class World:
 		self.registerCommands()
 	def registerCommands(self):
 		def takeCommand(line,world=None,commandprocessor=None):
+			print(commandprocessor.getPlayers())
 			commandprocessor.transmitToPlayer(' '.join(line),commandprocessor.getPlayers()[0])
 			return('Phished')
 		self.commandParser.addCommand('phish',takeCommand,{'args':['world','commandprocessor']})
