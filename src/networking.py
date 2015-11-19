@@ -68,7 +68,7 @@ Enter your choice > \r
 		log("Recieved line \n%s\n from client %s while in state %s" % (line.decode('utf8'),str(self.transport.getPeer()),self.state))
 		if self.state=='WAITING_FOR_INPUT':
 			log('RECIEVED CALLBACK LINE %s' % line.decode('utf8'))
-			self.inputCallback(line.decode('utf8'),self)
+			self.inputCallback(line,self)
 			self.state='PLAYING'
 			return
 		if self.state=="MENU":

@@ -4,6 +4,26 @@ import libinventory
 import libitems
 from datetime import datetime
 import sys
+def searchForItemInHashTable(itemName,dictionary):
+	names=itemName.split(' ')
+	if itemName=='' or itemName==' ':
+		return None
+	for name in names:
+		name=name.lower()
+		log('LOGGINGITEMS %s ALSO %s ' % (str([i.split(' ') for i in dictionary.keys()][0]),str(names)))
+		if name in [i.split(' ') for i in dictionary.keys()][0]:
+			items=[value for key, value in dictionary.items() if names[0] in key.lower()]
+			if len(items)==1:
+				item=items[0]
+				if len(item)==1:
+					final_item=item[0]
+					return ('single',final_item)
+				else:
+					return ('multi',item)
+			else:
+				concat_list=[item for sublist in items for item in sublist]
+				return('multi',concat_list)
+	return None
 class CommandParser:
 	def __init__(self,world):
 		self.commands={}
@@ -96,7 +116,8 @@ class World:
 		self.registerCommands()
 	def registerCommands(self):
 		def inputCallbackOne(line,protocol):
-			protocol.sendLine(line.encode('utf8'))
+			mush=searchForItemInHashTable(line,protocol.player.getCurrentRoomContents())
+			protocol.sendLine(str(mush).encode('utf8'))
 		def takeCommand(line,world=None,commandprocessor=None):
 			self.commandParser.nonBlockingInput(inputCallbackOne)
 			return('')
@@ -459,3 +480,5 @@ class Player:
 		self.health-=int(damage)
 		if self.health<=0:
 			raise BaseException
+	def getCurrentRoomContents(self):
+		return self.room.contents
