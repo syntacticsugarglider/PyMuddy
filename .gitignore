@@ -13,7 +13,6 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
-*.pyc
 *.stackdump
 
 # Windows shortcuts
@@ -43,3 +42,6 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+#Python complied stuff that isn't necessary
+*.pyc
