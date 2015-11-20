@@ -275,9 +275,9 @@ class World:
 				data='Your inventory is empty'
 			data+='Your health is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
 			return data
-		if command=="1337" or command=="haxxor" or command=="1337haxxor"
+		if command=="1337" or command=="haxxor" or command=="1337haxxor":
 			return "You are a 1337 |-|4><><0|2.\n   run(notavirus.trojanhorse)\n   init(godmode)\n   init(sopro) \nTentacles wrapped and locked. The system is now under your control. Type 'hack CIA' to continue."
-		if command=="hack CIA" or command=="hack cia"
+		if command=="hack CIA" or command=="hack cia":
 			return "\n >hack CIA.gov/allthesecrets \n...\nSECRETS: Area 51  Illuminati  9/11\n >9/11\n BUSH DID 9/11. 9/11 = 911. 911 has 3 numbers. A triangle has 3 points. Illuminati confirmed. 911. 911 makes you think of the fire department. Fire trucks are red. Red has 3 letters. Illuminati confirmed. BUSH AND THE ILLUMINATI DID 9/11. \n  /\ \n / O\ \n/____\ "
 		if command=="look" or command=="l":
 			for key,value in player.room.contents.iteritems():
