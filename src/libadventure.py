@@ -372,7 +372,7 @@ class World:
 			if command_array[1] in player.room.players.keys():
 				pass
 			else:
-				return "You can't see any such person to stab!"
+				return "You can't see any such person to attack!"
 			bleh=None
 			for key,value in player.inventory.items.iteritems():
 				if command_array[3] in key:
@@ -381,13 +381,16 @@ class World:
 				return "You don't have that thing!"
 			if player.inventory.items[bleh][0].properties['type']=='weapon':
 				pass
+			if player.inventory.items[bleh][0].properties['type']=='wizzered':
+				return "Smoke of Weed fils the room."
+				pass
 			else:
-				return "That's a silly thing to stab with."
+				return "That's a silly thing to attack with."
 			if not player.can_attack:
 				return "You are in no condition to attack!"
 			playername2=player.name
 			self.players[command_array[1]].take_damage(player.inventory.items[bleh][0].properties['damage'])
-			self.saytoplayer(command_array[1],"%s lunges at you with a %s! You lose %s life! You are now at %s life!\a" % (player.name,player.inventory.items[bleh][0].properties['stance'],player.inventory.items[bleh][0].properties['damage'],self.players[command_array[1]].health),factory,playername2)
+			self.saytoplayer(command_array[1],"%s attacks you with a %s! You lose %s life! You are now at %s life!\a" % (player.name,player.inventory.items[bleh][0].properties['stance'],player.inventory.items[bleh][0].properties['damage'],self.players[command_array[1]].health),factory,playername2)
 			return "You attack %s, dealing %s damage!" % (command_array[1],player.inventory.items[bleh][0].properties['damage'])
 		else:
 			return "I'm not sure I understand you"
