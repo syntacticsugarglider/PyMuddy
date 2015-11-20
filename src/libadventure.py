@@ -359,6 +359,8 @@ class World:
 			return("Honestly? Really? Are you actually saying that? Yes you are.\a")
 		elif command=='quit' or command=='exit':
 			return('#exit#')
+		elif command=="combust" or command=="die" or command=="EXPLOD"
+			self.players[command_array[1]].take_damage(100)
 		elif command_array[0]=='stab' or command_array[0]=='a' or command_array[0]=='kill' or command_array[0]=='attack':
 			print(command_array)
 			if len(command_array)<4:
