@@ -1,0 +1,5 @@
+name Pig Dungeon - Room 2
+appearance A kitchen. Meat cleavers hang on the walls. To your south is a wooden door. To the north is a very fancy wooden door. There is a white box on the west wall; when you open it, there is a cold space filled with food. You are confused.
+south Pig Dungeon
+north Pig Dungeon - Crossroads
+west Fridge

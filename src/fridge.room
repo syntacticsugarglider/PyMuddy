@@ -1,0 +1,4 @@
+name Fridge
+appearance You are in a fridge.
+east Pig Dungeon - Room 2
+contents chippy.json
