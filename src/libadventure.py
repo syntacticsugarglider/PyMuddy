@@ -263,9 +263,9 @@ class World:
 							del player.inventory.items[key]
 							return "Dropped"
 			return "You aren't carrying any such thing!"
-		if command=="hapl" or command=="hapl mei"
+		if command=="hapl" or command=="hapl mei":
 			return "You are a simple noob, standing in a room. This is PyMuddy, a MUD built with Python, or a Multiplayer Adventure without any graphics built with a coding language. It was made by two 1337 ninja coderz/haxxors, zenerboson and guidepupguy, and one silly noobish, MysteryPig. You can type a command and then press enter to do a thing. N makes you go north. W makes you go west. You can figure out the other two, plus up and down. You can type take blah to get an item called blah, if it is in the room. I checks your inventory and health. Drop lets you put a thing down. If you go west twice, there is free candy and an ornate burning chipmunk."
-		if command=="help" or command="noob" or command=="iamanoob" or command=="h" or command=="info"
+		if command=="help" or command=="noob" or command=="iamanoob" or command=="h" or command=="info":
 			return "This is not the command you are looking for. Try hapl mei."
 		if command=="i" or command=="inventory":
 			data=''
@@ -365,8 +365,6 @@ class World:
 			return("Honestly? Really? Are you actually saying that? Yes you are.\a")
 		elif command=='quit' or command=='exit':
 			return('#exit#')
-		elif command=="combust" or command=="die" or command=="EXPLOD"
-			self.players[command_array[1]].take_damage(100)
 		elif command_array[0]=='stab' or command_array[0]=='a' or command_array[0]=='kill' or command_array[0]=='attack':
 			print(command_array)
 			if len(command_array)<4:
