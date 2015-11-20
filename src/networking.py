@@ -82,7 +82,7 @@ Enter your choice > \r
 				self.sendLine("Please enter a username > ".encode('utf8'))
 				self.state="CREATEACCOUNT1"
 				return
-			if line.decode('utf8')=="Hapl Mei"
+			if line.decode('utf8')=="Hapl Mei":
 				self.sendline("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 				self.sendline("You are a simple noob, standing in a room. This is PyMuddy, a MUD built with Python, or a Multiplayer Adventure without any graphics built with a coding language. It was made by two 1337 ninja coderz/haxxors, zenerboson and guidepupguy, and one silly noobish, MysteryPig. You can type a command and then press enter to do a thing. N makes you go north. W makes you go west. You can figure out the other two, plus up and down. You can type take blah to get an item called blah, if it is in the room. I checks your inventory and health. Drop lets you put a thing down. If you go west twice, there is free candy and an ornate burning chipmunk.")
 		if self.state=="PLAYING":
