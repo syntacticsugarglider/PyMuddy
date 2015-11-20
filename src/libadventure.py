@@ -263,7 +263,10 @@ class World:
 							del player.inventory.items[key]
 							return "Dropped"
 			return "You aren't carrying any such thing!"
-
+		if command=="hapl" or command=="hapl mei"
+			return "You are a simple noob, standing in a room. This is PyMuddy, a MUD built with Python, or a Multiplayer Adventure without any graphics built with a coding language. It was made by two 1337 ninja coderz/haxxors, zenerboson and guidepupguy, and one silly noobish, MysteryPig. You can type a command and then press enter to do a thing. N makes you go north. W makes you go west. You can figure out the other two, plus up and down. You can type take blah to get an item called blah, if it is in the room. I checks your inventory and health. Drop lets you put a thing down. If you go west twice, there is free candy and an ornate burning chipmunk."
+		if command=="help" or command="noob" or command=="iamanoob" or command=="h" or command=="info"
+			return "This is not the command you are looking for. Try hapl mei."
 		if command=="i" or command=="inventory":
 			data=''
 			for key,value in player.inventory.items.iteritems():
@@ -272,7 +275,8 @@ class World:
 				data='Your inventory is empty'
 			data+='Your health is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
 			return data
-
+		if command=="1337" or command=="haxxor" or command=="1337haxxor"
+			return "You are a 1337 |-|4><><0|2. run(notavirus.trojanhorse) init(godmode) init(sopro). Tentacles wrapped and locked, the system is now under your control."
 		if command=="look" or command=="l":
 			for key,value in player.room.contents.iteritems():
 				if len(value)==1:
