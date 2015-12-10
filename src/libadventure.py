@@ -364,7 +364,7 @@ class World:
 		elif command=="xyzzy":
 			return("Honestly? Really? Are you actually saying that? Yes you are.\a")
 		elif command=='quit' or command=='exit':
-			return('#exit#')
+att			return('#exit#')
 		elif command_array[0]=='stab' or command_array[0]=='a' or command_array[0]=='kill' or command_array[0]=='attack':
 			print(command_array)
 			if len(command_array)<4:
@@ -380,9 +380,6 @@ class World:
 			if bleh==None:
 				return "You don't have that thing!"
 			if player.inventory.items[bleh][0].properties['type']=='weapon':
-				pass
-			if player.inventory.items[bleh][0].properties['type']=='wizzered':
-				return "Smoke of Weed fils the room."
 				pass
 			else:
 				return "That's a silly thing to attack with."
