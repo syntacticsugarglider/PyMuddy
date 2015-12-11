@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/zenerboson/PyMuddy.svg?branch=master)](https://travis-ci.org/zenerboson/PyMuddy)
 # PyMuddy
 This is a pure-python MUD engine/server
 
