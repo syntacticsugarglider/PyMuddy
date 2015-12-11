@@ -364,7 +364,7 @@ class World:
 		elif command=="xyzzy":
 			return("Honestly? Really? Are you actually saying that? Yes you are.\a")
 		elif command=='quit' or command=='exit':
-            return('#exit#')
+			return('#exit#')
 		elif command_array[0]=='stab' or command_array[0]=='a' or command_array[0]=='kill' or command_array[0]=='attack':
 			print(command_array)
 			if len(command_array)<4:
