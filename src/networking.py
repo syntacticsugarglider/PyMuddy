@@ -179,7 +179,7 @@ Enter your choice (1,2) > \r
 					''')
 					return
 				if " " in test:
-					self.sendLine(b"Bad username. Spaces are not allowed\r\nExplanation: %s >\r\n" % test.replace(' ','|'))
+					self.sendLine(b"Bad username. Spaces are not allowed\r\nExplanation: %s >\r\n" % test.replace(' ','|').encode('utf8'))
 					self.state="MENU"
 					self.sendLine(b'''
 Welcome to the incredible PyMuddy!\r
