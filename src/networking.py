@@ -93,7 +93,7 @@ Enter your choice > \r
 			else:
 				data=world.process_command(line.decode('utf8'),self.username,self.factory,self.username).encode('utf8')
 				if data=='#exit#':
-					self.loseConnection()
+					self.transport.loseConnection()
 					return
 				self.sendLine(data)
 		if self.state=="USERLOGIN1":
