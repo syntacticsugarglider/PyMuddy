@@ -178,7 +178,7 @@ Welcome to the incredible PyMuddy!\r
 Enter your choice (1,2) > \r
 					''')
 					return
-				if test==" " or " " in test:
+				if " " in test:
 					self.sendLine(b"Bad username. Spaces are not allowed\r\n")
 					self.state="MENU"
 					self.sendLine(b'''
