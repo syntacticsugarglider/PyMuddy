@@ -380,15 +380,21 @@ class World:
 			if bleh==None:
 				return "You don't have that thing!"
 			if player.inventory.items[bleh][0].properties['type']=='weapon':
-				pass
+				attacktype=''
 			else:
 				return "That's a silly thing to attack with."
+			if player.inventory.items[bleh][0].properties['type']=='wizzered':
+				attacktype='smokeofweed'
 			if not player.can_attack:
 				return "You are in no condition to attack!"
 			playername2=player.name
 			self.players[command_array[1]].take_damage(player.inventory.items[bleh][0].properties['damage'])
-			self.saytoplayer(command_array[1],"%s attacks you with a %s! You lose %s life! You are now at %s life!\a" % (player.name,player.inventory.items[bleh][0].properties['stance'],player.inventory.items[bleh][0].properties['damage'],self.players[command_array[1]].health),factory,playername2)
-			return "You attack %s, dealing %s damage!" % (command_array[1],player.inventory.items[bleh][0].properties['damage'])
+			if attacktype=='':
+				self.saytoplayer(command_array[1],"%s attacks you with a %s! You lose %s life! You are now at %s life!\a" % (player.name,player.inventory.items[bleh][0].properties['stance'],player.inventory.items[bleh][0].properties['damage'],self.players[command_array[1]].health),factory,playername2)
+				return "You attack %s, dealing %s damage!" % (command_array[1],player.inventory.items[bleh][0].properties['damage'])
+			else:
+				self.saytoplayer(command_array[1],"%s attacks you with a %s! You lose %s life! You are now at %s life!\a Also, smoke of weed fills the room! You are now high!" % (player.name,player.inventory.items[bleh][0].properties['stance'],player.inventory.items[bleh][0].properties['damage'],self.players[command_array[1]].health),factory,playername2)
+				return "You attack %s, dealing %s damage! Smoke of weed fills the room! Make your escape now!" % (command_array[1],player.inventory.items[bleh][0].properties['damage'])
 		else:
 			return "I'm not sure I understand you"
 class Room:
