@@ -125,6 +125,7 @@ class World:
 		room2.players[playername].room=room2
 		del room1.players[playername]
 	def remove_player(self,playername):
+		self.players[playername]=None
 		del self.players[playername]
 	def saytoplayer(self,playername,text,factory,player2):
 		try:
