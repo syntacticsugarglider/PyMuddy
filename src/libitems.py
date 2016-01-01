@@ -5,6 +5,7 @@ class Item:
 		self.shortdescription=""
 		self.longdescription=""
 		self.name=""
+		self.additions=[]
 		self.properties={}
 		fp=open(filepath,"r+")
 		json_dict=json.load(fp)

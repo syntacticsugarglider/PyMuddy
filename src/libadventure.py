@@ -147,21 +147,39 @@ class World:
 				if item[0]=='multi':
 					player.equipped=item[1]
 					returnstring+='%s %s equipped' % (str(len(item[1])),item[1][0].shortdescription)
+					for each in player.equipped:
+						each.additions.append(' (equipped) ')
 				if item[0]=='single':
 					player.equipped=item[1]
 					returnstring+='%s equipped' % item[1].shortdescription
+					player.equipped.additions.append(' (equipped) ')
 				return returnstring
 			except KeyError:
 				return "You do not have that to equip!"
 		def unequipCommand(line,player=None):
 			line=" ".join(line)
+			if type(player.equipped)==type([]):
+				for each in player.equipped:
+					each.additions.remove(' (equipped) ')
+			else:
+				player.equipped.additions.remove(' (equipped) ')
 			player.equipped=None
 			return "Equipped your bare hands."
+		def inventoryCommand(line,player=None):
+			data=''
+			for key,value in player.inventory.items.iteritems():
+				data+='%sx %s%s\n' % (str(len(value)),value[0].shortdescription,''.join(value[0].additions))
+			if data=="":
+				data='Your inventory is empty'
+			data+='Your health is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
+			return data
 		self.commandParser.addCommand('phish',phishCommand,{'args':['world','commandprocessor']})
 		self.commandParser.addCommand('attack',attackCommand,{'args':['world','commandprocessor','player']})
-		self.commandParser.addCommand('kill',attackCommand,{'args':['world','commandprocessor','player']})
+		self.commandParser.registerCommandAlias('attack','kill')
 		self.commandParser.addCommand('equip',equipCommand,{'args':['player']})
 		self.commandParser.addCommand('unequip',unequipCommand,{'args':['player']})
+		self.commandParser.addCommand('inventory',inventoryCommand,{'args':['player']})
+		self.commandParser.registerCommandAlias('inventory','i')
 	def add_room(self,room):
 		self.rooms[room.name]=room
 	def add_player(self,player):
