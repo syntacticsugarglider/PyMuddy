@@ -5,6 +5,7 @@ import libitems
 from datetime import datetime
 import sys
 from extensionlocals import *
+import gamepages
 class CommandParser:
 	def __init__(self,world):
 		self.commands={}
