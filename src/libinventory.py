@@ -14,3 +14,5 @@ class Inventory:
 		del self.items[name]
 	def getItemByName(self,name):
 		return self.items[name]
+	def getItemTable(self):
+		return self.items

@@ -113,6 +113,9 @@ class World:
 		self.state=''
 		self.registerCommands()
 	def registerCommands(self):
+		#IMPORTANT!!!
+		#DEFINE NEW COMMANDS HERE USING UPDATED API, NOT IN THE WORLD COMMAND PARSER CALL
+		#TODO Port entirety of old parser functions to new system
 		#Testing callback
 		def inputCallbackOne(line,protocol):
 			mush=searchForItemInHashTable(line,protocol.player.getCurrentRoomContents())
@@ -122,7 +125,10 @@ class World:
 			commandprocessor.nonBlockingInput(inputCallbackOne)
 			return('')
 		def attackCommand(line,world=None,commandprocessor=None,player=None):
-			if commandprocessor.isPlayerInRoom(commandprocessor.getPlayerByName(line),player.room):
+			line=" ".join(line)
+			if player.equipped==None:
+				return "You currently are not permitted to attack with your bare hands. Combat is a WIP, sorry!"
+			if commandprocessor.isPlayerInRoom(player.room,commandprocessor.getPlayerByName(line)):
 				if player.equipped.getProperty('type')=='weapon':
 					commandprocessor.getPlayerByName(line).combatAttacked(player.equipped.getProperty('damage'),player)
 					return "Attacked"
@@ -132,32 +138,45 @@ class World:
 				return "You can see no such thing to attack!"
 
 		def equipCommand(line,player=None):
+			line=" ".join(line)
 			try:
-				player.equipped=player.inventory.getItemByName(line)
+				item=searchForItemInHashTable(line,player.inventory.getItemTable())
 				returnstring=''
-				item=player.inventory.getItemByName(line)
-				if len(item)>1:
-					returnstring+='%s %s equipped' % (str(len(item)),item.shortdescription)
-				else:
-					returnstring+='%s equipped' % item.shortdescription
+				if item==None:
+					return "You do not have that to equip!"
+				if item[0]=='multi':
+					player.equipped=item[1]
+					returnstring+='%s %s equipped' % (str(len(item[1])),item[1][0].shortdescription)
+				if item[0]=='single':
+					player.equipped=item[1]
+					returnstring+='%s equipped' % item[1].shortdescription
 				return returnstring
 			except KeyError:
 				return "You do not have that to equip!"
+		def unequipCommand(line,player=None):
+			line=" ".join(line)
+			player.equipped=None
+			return "Equipped your bare hands."
 		self.commandParser.addCommand('phish',phishCommand,{'args':['world','commandprocessor']})
 		self.commandParser.addCommand('attack',attackCommand,{'args':['world','commandprocessor','player']})
 		self.commandParser.addCommand('kill',attackCommand,{'args':['world','commandprocessor','player']})
 		self.commandParser.addCommand('equip',equipCommand,{'args':['player']})
+		self.commandParser.addCommand('unequip',unequipCommand,{'args':['player']})
 	def add_room(self,room):
 		self.rooms[room.name]=room
 	def add_player(self,player):
 		self.players[player.name]=player
 		self.spawn.players[player.name]=player
+		self.players[player.name].room=self.spawn
 		self.spawn.players[player.name].room=self.spawn
 	def move_player(self,room1,room2,playername):
+		self.players[playername].room=room2
 		room2.players[playername]=room1.players[playername]
 		room2.players[playername].room=room2
 		del room1.players[playername]
+		room1.players[playername]=None
 	def remove_player(self,playername):
+		self.players[playername].room.players[playername]=None
 		self.players[playername]=None
 		del self.players[playername]
 	def saytoplayer(self,playername,text,factory,player2):
@@ -512,6 +531,7 @@ class Player:
 		self.health=100
 		self.maxhealth=100
 		self.can_attack=True
+		self.equipped=None
 		self.inventory=libinventory.Inventory()
 		self.name=name
 	def take_damage(self,damage):
