@@ -106,6 +106,8 @@ def log(text):
 class World:
 	def __init__(self,initialroom):
 		self.commandParser=CommandParser(self)
+		self.manpage=gamepages.GamePage()
+		self.commandParser.registerReferenceArgument('gamepagers',self.manpage)
 		self.rooms={}
 		self.players={}
 		self.rooms[initialroom.name]=initialroom
@@ -173,6 +175,16 @@ class World:
 				data='Your inventory is empty'
 			data+='Your health is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
 			return data
+		def manCommand(line,gamepagers=None):
+			if line==[]:
+				data='\n\r'+gamepagers.getHelpPage()
+				data+=gamepagers.getFullManual()
+				return data
+			if len(line)>0:
+				for each in line:
+					data='\n\r'
+					data+=gamepagers.getManualForCommand(each)
+				return data
 		self.commandParser.addCommand('phish',phishCommand,{'args':['world','commandprocessor']})
 		self.commandParser.addCommand('attack',attackCommand,{'args':['world','commandprocessor','player']})
 		self.commandParser.registerCommandAlias('attack','kill')
@@ -180,6 +192,7 @@ class World:
 		self.commandParser.addCommand('unequip',unequipCommand,{'args':['player']})
 		self.commandParser.addCommand('inventory',inventoryCommand,{'args':['player']})
 		self.commandParser.registerCommandAlias('inventory','i')
+		self.commandParser.addCommand('man',manCommand,{'args':['gamepagers']})
 	def add_room(self,room):
 		self.rooms[room.name]=room
 	def add_player(self,player):

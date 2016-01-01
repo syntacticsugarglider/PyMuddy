@@ -1,0 +1,7 @@
+@command equip <item>
+#Equips specified item, must be in your inventory to equip
+@command unequip
+#Unequips all items
+@command look
+#Returns a description of the room
+#Will specify players contained within, as well as items
