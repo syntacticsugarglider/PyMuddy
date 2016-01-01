@@ -50,6 +50,11 @@ class CommandParser:
 			return True
 		except KeyError:
 			return False
+	def getPlayerByName(self,name):
+		try:
+			return self.referenceArguments['world'].players[name]
+		except KeyError:
+			return None
 	def getNetworkClients(self):
 		try:
 			self.referenceArguments['factory'].clients
@@ -107,13 +112,40 @@ class World:
 		self.state=''
 		self.registerCommands()
 	def registerCommands(self):
+		#Testing callback
 		def inputCallbackOne(line,protocol):
 			mush=searchForItemInHashTable(line,protocol.player.getCurrentRoomContents())
 			protocol.sendLine(str(mush).encode('utf8'))
+		#Testing commmand for version two command implementations and callbacks
 		def phishCommand(line,world=None,commandprocessor=None):
-			self.commandParser.nonBlockingInput(inputCallbackOne)
+			commandprocessor.nonBlockingInput(inputCallbackOne)
 			return('')
+		def attackCommand(line,world=None,commandprocessor=None,player=None):
+			if commandprocessor.isPlayerInRoom(commandprocessor.getPlayerByName(line),player.room):
+				if player.equipped.getProperty('type')=='weapon':
+					commandprocessor.getPlayerByName(line).combatAttacked(player.equipped.getProperty('damage'),player)
+					return "Attacked"
+				else:
+					return "You do not have a valid weapon equipped!"
+			else:
+				return "You can see no such thing to attack!"
+
+		def equipCommand(line,player=None):
+			try:
+				player.equipped=player.inventory.getItemByName(line)
+				returnstring=''
+				item=player.inventory.getItemByName(line)
+				if len(item)>1:
+					returnstring+='%s %s equipped' % (str(len(item)),item.shortdescription)
+				else:
+					returnstring+='%s equipped' % item.shortdescription
+				return returnstring
+			except KeyError:
+				return "You do not have that to equip!"
+
 		self.commandParser.addCommand('phish',phishCommand,{'args':['world','commandprocessor']})
+		self.commandParser.addCommand('attack',attackCommand,{'args':['world','commandprocessor','player']})
+		self.commandParser.addCommand('kill',attackCommand,{'args':['world','commandprocessor','player']})
 	def add_room(self,room):
 		self.rooms[room.name]=room
 	def add_player(self,player):
@@ -488,3 +520,33 @@ class Player:
 			self.room.contents[items[0].name]=items
 	def getCurrentRoomContents(self):
 		return self.room.contents
+	def combatAttacked(self,damage,attacker):
+		self.health-=int(damage)
+	def checkItemInInventory(self,itemname):
+		try:
+			return len(self.inventory.getItemByName(itemname))
+		except KeyError:
+			return 0
+class Creature:
+	def __init__(self,properties):
+		self.properties=properties
+		self.name=properties['name']
+		self.health=properties['health']
+		self.maxhealth=properties['maxhealth']
+		self.drops=libinventory.Inventory()
+		for key,value in self.properties['drops'].iteritems():
+			self.drops.additem(key,value)
+		self.behaviours=properties['behaviours']
+class TriggerManager:
+	def __init__(self,world):
+		self.eventmap={}
+		self.worldreference=world
+	def addEventWithTrigger(self,triggername,event):
+		try:
+			self.eventmap[triggername]
+		except KeyError:
+			self.eventmap[triggername]=[]
+		self.eventmap[triggername].append(event)
+	def trigger(self,eventname):
+		for event in self.eventmap[eventname]:
+			event()

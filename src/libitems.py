@@ -21,3 +21,5 @@ class Item:
 				self.longdescription=value
 			else:
 				self.properties[key]=value
+	def getProperty(self,property):
+		return self.properties[property]
