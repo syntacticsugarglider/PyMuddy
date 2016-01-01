@@ -142,10 +142,10 @@ class World:
 				return returnstring
 			except KeyError:
 				return "You do not have that to equip!"
-
 		self.commandParser.addCommand('phish',phishCommand,{'args':['world','commandprocessor']})
 		self.commandParser.addCommand('attack',attackCommand,{'args':['world','commandprocessor','player']})
 		self.commandParser.addCommand('kill',attackCommand,{'args':['world','commandprocessor','player']})
+		self.commandParser.addCommand('equip',equipCommand,{'args':['player']})
 	def add_room(self,room):
 		self.rooms[room.name]=room
 	def add_player(self,player):
