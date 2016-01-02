@@ -5,6 +5,7 @@ class Item:
 		self.shortdescription=""
 		self.longdescription=""
 		self.name=""
+		self.additions=[]
 		self.properties={}
 		fp=open(filepath,"r+")
 		json_dict=json.load(fp)
@@ -21,3 +22,5 @@ class Item:
 				self.longdescription=value
 			else:
 				self.properties[key]=value
+	def getProperty(self,property):
+		return self.properties[property]

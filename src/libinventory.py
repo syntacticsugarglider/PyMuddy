@@ -12,3 +12,7 @@ class Inventory:
 		self.items[name]=item
 	def removeitem(self,name):
 		del self.items[name]
+	def getItemByName(self,name):
+		return self.items[name]
+	def getItemTable(self):
+		return self.items

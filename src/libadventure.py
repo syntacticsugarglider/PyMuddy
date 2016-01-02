@@ -5,6 +5,7 @@ import libitems
 from datetime import datetime
 import sys
 from extensionlocals import *
+import gamepages
 class CommandParser:
 	def __init__(self,world):
 		self.commands={}
@@ -50,6 +51,11 @@ class CommandParser:
 			return True
 		except KeyError:
 			return False
+	def getPlayerByName(self,name):
+		try:
+			return self.referenceArguments['world'].players[name]
+		except KeyError:
+			return None
 	def getNetworkClients(self):
 		try:
 			self.referenceArguments['factory'].clients
@@ -100,6 +106,8 @@ def log(text):
 class World:
 	def __init__(self,initialroom):
 		self.commandParser=CommandParser(self)
+		self.manpage=gamepages.GamePage()
+		self.commandParser.registerReferenceArgument('gamepagers',self.manpage)
 		self.rooms={}
 		self.players={}
 		self.rooms[initialroom.name]=initialroom
@@ -107,24 +115,99 @@ class World:
 		self.state=''
 		self.registerCommands()
 	def registerCommands(self):
+		#IMPORTANT!!!
+		#DEFINE NEW COMMANDS HERE USING UPDATED API, NOT IN THE WORLD COMMAND PARSER CALL
+		#TODO Port entirety of old parser functions to new system
+		#Testing callback
 		def inputCallbackOne(line,protocol):
 			mush=searchForItemInHashTable(line,protocol.player.getCurrentRoomContents())
 			protocol.sendLine(str(mush).encode('utf8'))
+		#Testing commmand for version two command implementations and callbacks
 		def phishCommand(line,world=None,commandprocessor=None):
-			self.commandParser.nonBlockingInput(inputCallbackOne)
+			commandprocessor.nonBlockingInput(inputCallbackOne)
 			return('')
+		def attackCommand(line,world=None,commandprocessor=None,player=None):
+			line=" ".join(line)
+			if player.equipped==None:
+				return "You currently are not permitted to attack with your bare hands. Combat is a WIP, sorry!"
+			if commandprocessor.isPlayerInRoom(player.room,commandprocessor.getPlayerByName(line)):
+				if player.equipped.getProperty('type')=='weapon':
+					commandprocessor.getPlayerByName(line).combatAttacked(player.equipped.getProperty('damage'),player)
+					return "Attacked"
+				else:
+					return "You do not have a valid weapon equipped!"
+			else:
+				return "You can see no such thing to attack!"
+
+		def equipCommand(line,player=None):
+			line=" ".join(line)
+			try:
+				item=searchForItemInHashTable(line,player.inventory.getItemTable())
+				returnstring=''
+				if item==None:
+					return "You do not have that to equip!"
+				if item[0]=='multi':
+					player.equipped=item[1]
+					returnstring+='%s %s equipped' % (str(len(item[1])),item[1][0].shortdescription)
+					for each in player.equipped:
+						each.additions.append(' (equipped) ')
+				if item[0]=='single':
+					player.equipped=item[1]
+					returnstring+='%s equipped' % item[1].shortdescription
+					player.equipped.additions.append(' (equipped) ')
+				return returnstring
+			except KeyError:
+				return "You do not have that to equip!"
+		def unequipCommand(line,player=None):
+			line=" ".join(line)
+			if type(player.equipped)==type([]):
+				for each in player.equipped:
+					each.additions.remove(' (equipped) ')
+			else:
+				player.equipped.additions.remove(' (equipped) ')
+			player.equipped=None
+			return "Equipped your bare hands."
+		def inventoryCommand(line,player=None):
+			data=''
+			for key,value in player.inventory.items.iteritems():
+				data+='%sx %s%s\n' % (str(len(value)),value[0].shortdescription,''.join(value[0].additions))
+			if data=="":
+				data='Your inventory is empty'
+			data+='Your health is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
+			return data
+		def manCommand(line,gamepagers=None):
+			if line==[]:
+				data='\n\r'+gamepagers.getHelpPage()
+				data+=gamepagers.getFullManual()
+				return data
+			if len(line)>0:
+				for each in line:
+					data='\n\r'
+					data+=gamepagers.getManualForCommand(each)
+				return data
 		self.commandParser.addCommand('phish',phishCommand,{'args':['world','commandprocessor']})
+		self.commandParser.addCommand('attack',attackCommand,{'args':['world','commandprocessor','player']})
+		self.commandParser.registerCommandAlias('attack','kill')
+		self.commandParser.addCommand('equip',equipCommand,{'args':['player']})
+		self.commandParser.addCommand('unequip',unequipCommand,{'args':['player']})
+		self.commandParser.addCommand('inventory',inventoryCommand,{'args':['player']})
+		self.commandParser.registerCommandAlias('inventory','i')
+		self.commandParser.addCommand('man',manCommand,{'args':['gamepagers']})
 	def add_room(self,room):
 		self.rooms[room.name]=room
 	def add_player(self,player):
 		self.players[player.name]=player
 		self.spawn.players[player.name]=player
+		self.players[player.name].room=self.spawn
 		self.spawn.players[player.name].room=self.spawn
 	def move_player(self,room1,room2,playername):
+		self.players[playername].room=room2
 		room2.players[playername]=room1.players[playername]
 		room2.players[playername].room=room2
 		del room1.players[playername]
+		room1.players[playername]=None
 	def remove_player(self,playername):
+		self.players[playername].room.players[playername]=None
 		self.players[playername]=None
 		del self.players[playername]
 	def saytoplayer(self,playername,text,factory,player2):
@@ -479,6 +562,7 @@ class Player:
 		self.health=100
 		self.maxhealth=100
 		self.can_attack=True
+		self.equipped=None
 		self.inventory=libinventory.Inventory()
 		self.name=name
 	def take_damage(self,damage):
@@ -488,3 +572,33 @@ class Player:
 			self.room.contents[items[0].name]=items
 	def getCurrentRoomContents(self):
 		return self.room.contents
+	def combatAttacked(self,damage,attacker):
+		self.health-=int(damage)
+	def checkItemInInventory(self,itemname):
+		try:
+			return len(self.inventory.getItemByName(itemname))
+		except KeyError:
+			return 0
+class Creature:
+	def __init__(self,properties):
+		self.properties=properties
+		self.name=properties['name']
+		self.health=properties['health']
+		self.maxhealth=properties['maxhealth']
+		self.drops=libinventory.Inventory()
+		for key,value in self.properties['drops'].iteritems():
+			self.drops.additem(key,value)
+		self.behaviours=properties['behaviours']
+class TriggerManager:
+	def __init__(self,world):
+		self.eventmap={}
+		self.worldreference=world
+	def addEventWithTrigger(self,triggername,event):
+		try:
+			self.eventmap[triggername]
+		except KeyError:
+			self.eventmap[triggername]=[]
+		self.eventmap[triggername].append(event)
+	def trigger(self,eventname):
+		for event in self.eventmap[eventname]:
+			event()
