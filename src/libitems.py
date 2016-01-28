@@ -25,4 +25,4 @@ class Entity(object):
 		self=None
 class Item(Entity):
 	def __init__(self,filepath):
-		super(Item,self).__init__(self,filepath)
+		super(Item,self).__init__(filepath)
