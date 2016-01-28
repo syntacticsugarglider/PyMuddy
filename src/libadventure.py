@@ -579,6 +579,8 @@ class Player:
 			return len(self.inventory.getItemByName(itemname))
 		except KeyError:
 			return 0
+
+
 class Creature:
 	def __init__(self,properties):
 		self.properties=properties
