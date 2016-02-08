@@ -118,7 +118,7 @@ class CommandParser:
 					player.isdenied=False
 					self.deniedplayers.remove(player)
 				if self.stopmessageeveryone!=None:
-					self.transmitToEveryoneInRoom(self.stopmessageeveryone,player.room,False)
+					self.transmitToEveryoneInRoom(self.stopmessageeveryone.replace('</>',player.name),player.room,False)
 				return(True, self.stopmessageme)
 			else:
 				return(True, self.state)
