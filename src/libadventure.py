@@ -153,6 +153,7 @@ class CommandParser:
 			self.pertickmessageeveryone=asplit[asplit.index('tickeveryonemessage')+1].replace("("," ").replace(")"," ").replace("'"," ")
 		if 'tickmemessage' in asplit:
 			self.pertickmessageme=asplit[asplit.index('tickmemessage')+1].replace("("," ").replace(")"," ").replace("'"," ")
+		return ""
 
 
 #Cthulhu was here
