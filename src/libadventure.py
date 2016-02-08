@@ -167,8 +167,9 @@ class CommandParser:
 		asplit=spell['action'].split(' ')
 		if 'deny' in asplit:
 			self.deny=True
-			for name,player in player.room.players.iteritems():
-				player.isdenied=True;
+			for name,playerx in player.room.players.iteritems():
+				if playerx!=player:
+					playerx.isdenied=True;
 		AOE=False
 		if 'tick' in asplit:
 			tick=True
