@@ -8,7 +8,7 @@ def log(text):
 	sys.stdout.write(text2)
 print("Done!")
 log("Loading twisted.internet.reactor,protocol,endpoints...\n")
-from twisted.internet import reactor, protocol, endpoints
+from twisted.internet import reactor, protocol, endpoints, task
 log("Done!\n")
 log("Loading twisted.protocols.basic...\n")
 from twisted.protocols import basic
@@ -216,6 +216,9 @@ class GameFactory(protocol.Factory):
 	def buildProtocol(self, addr):
 		self.protocol=GameProtocol(self)
 		return self.protocol
-
+def tick():
+	print('doing work')
+l=task.LoopingCall(tick)
+l.start(1)
 endpoints.serverFromString(reactor, "tcp:1337").listen(GameFactory())
 reactor.run()
