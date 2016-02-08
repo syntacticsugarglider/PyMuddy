@@ -185,6 +185,17 @@ class World:
 					data='\n\r'
 					data+=gamepagers.getManualForCommand(each)
 				return data
+		def readCommand(line, player=None):
+			name=(' ').join(line)
+			item=player.getInventoryItemByDescription(name)
+			if item!=None:
+				if item.properties['type']=='book':
+					return item.properties['readmessage']
+				else:
+					"That's not a book!"
+			else:
+				return "You aren't carrying that!"
+		self.commandParser.addCommand('read',readCommand,{'args':['player']})
 		self.commandParser.addCommand('phish',phishCommand,{'args':['world','commandprocessor']})
 		self.commandParser.addCommand('attack',attackCommand,{'args':['world','commandprocessor','player']})
 		self.commandParser.registerCommandAlias('attack','kill')
@@ -580,7 +591,13 @@ class Player:
 		except KeyError:
 			return 0
 
-
+	def getInventoryItemByDescription(self,itemname):
+		name=itemname.split(' ')
+		for key,value in self.inventory.items.iteritems():
+				for x in name:
+					if x in key:
+						return value
+		return None
 class Creature:
 	def __init__(self,properties):
 		self.properties=properties
