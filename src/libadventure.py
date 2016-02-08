@@ -14,10 +14,8 @@ class CommandParser:
 		self.blockingInput=''
 		self.state='normal'
 	def _tick(self,player,world):
-		try:
-			self.transmitToCurrentPlayer(self.pertickmemessage.encode('utf8'))
-		except:
-			pass
+		self.transmitToCurrentPlayer(self.pertickmemessage.encode('utf8'))
+
 		try:
 			player.sanity-=self.ticksanitycost
 			self.transmitToCurrentPlayer(('The spell drains %s sanity, leaving you with %s' % (str(self.ticksanitycost),str(player.sanity))).encode('utf8'))
@@ -28,10 +26,8 @@ class CommandParser:
 			self.transmitToCurrentPlayer(('The spell drains %s health, leaving you with %s' % (str(self.tickhealthcost),str(player.health))).encode('utf8'))
 		except:
 			pass
-		try:
-			self.transmitToEveryoneInRoom(self.pertickmessageeveryone.encode('utf8'),player.room,False)
-		except:
-			pass
+
+		self.transmitToEveryoneInRoom(self.pertickmessageeveryone.encode('utf8'),player.room,False)
 
 	def addCommand(self,name,function,properties_dict):
 		self.commands[name]=(function,properties_dict)
@@ -104,6 +100,8 @@ class CommandParser:
 			client_list.append(client.player)
 		return client_list
 	def parseCommand(self,input,player,factory,world):
+		if player.isdenied:
+			return(True,self.denymessage)
 		if self.state!='normal':
 			if input.strip('\n\r')=='stop':
 				self.state='normal'
@@ -167,6 +165,10 @@ class CommandParser:
 				self.tickhealthcost=int(csplit[csplit.index('tick')+2])
 			self.tickcosttype=tickcosttype
 		asplit=spell['action'].split(' ')
+		if 'deny' in asplit:
+			self.deny=True
+			for name,player in player.room.players.iteritems():
+				player.isdenied=True;
 		AOE=False
 		if 'tick' in asplit:
 			tick=True
@@ -177,6 +179,7 @@ class CommandParser:
 				self.stopmessageeveryone=spell['endcastmessagearoundtarget']
 			else:
 				self.stopmessageeveryone=None
+		self.denymessage=spell['lockdownmessage']
 		if asplit[0]=='AOE':
 			AOE=True
 		if 'tickeveryonemessage' in asplit:
