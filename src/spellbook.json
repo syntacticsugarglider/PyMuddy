@@ -7,7 +7,7 @@
   "trigger":"Wra Seraf Domoff Neru Sa Loka",
   "startcastmessage":"You begin to sing a song of unspeakable evil, and your mind begins to twist, as you throw away your sanity for great power. Type 'stop' to stop singing.",
   "startcastaroundtarget":"</> begins to sing a song of unspeakable evil, some twisted work of the devil",
-  "action":"AOE tick deny damage 3 tickmemessage ('The song twists your mind, consuming a piece of your sanity') tickeveryonemessage ('The song consumes your mind and withers your flesh.')",
+  "action":"AOE tick deny damage 3 tickmemessage ('The&song&twists&your&mind,&consuming&a&piece&of&your&sanity') tickeveryonemessage ('The&song&consumes&your&mind&and&withers&your&flesh.')",
   "cost":"tick sanity 2 start sanity 5",
   "runningmessage":"The song fills your mind. You cannot perform any actions until you stop.",
   "endcastmessage":"You stop singing.",

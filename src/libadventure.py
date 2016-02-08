@@ -184,9 +184,9 @@ class CommandParser:
 		if asplit[0]=='AOE':
 			AOE=True
 		if 'tickeveryonemessage' in asplit:
-			self.pertickmessageeveryone=asplit[asplit.index('tickeveryonemessage')+1].replace("("," ").replace(")"," ").replace("'"," ")
+			self.pertickmessageeveryone=asplit[asplit.index('tickeveryonemessage')+1].replace("(","").replace(")","").replace("'","").replace('&',' ')
 		if 'tickmemessage' in asplit:
-			self.pertickmessageme=asplit[asplit.index('tickmemessage')+1].replace("("," ").replace(")"," ").replace("'"," ")
+			self.pertickmessageme=asplit[asplit.index('tickmemessage')+1].replace("("," ").replace(")"," ").replace("'"," ").replace('&',' ')
 		return ""
 
 
