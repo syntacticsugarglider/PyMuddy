@@ -189,6 +189,7 @@ class World:
 			name=(' ').join(line)
 			item=player.getInventoryItemByDescription(name)
 			if item!=None:
+				item=item[0]
 				if item.properties['type']=='book':
 					return item.properties['readmessage']
 				else:
