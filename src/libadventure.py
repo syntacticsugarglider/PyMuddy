@@ -85,13 +85,13 @@ class CommandParser:
 		return client_list
 	def parseCommand(self,input,player,factory):
 		if self.state!='normal':
-			if input.strip('\n\r')=='stop'
-			self.state='normal'
-			if self.stopmessageeveryone!=None:
-				self.transmitToEveryoneInRoom(self.stopmessageeveryone,player.room,False)
-			return(True, self.endcastmessage)
-		else:
-			return(True, self.state)
+			if input.strip('\n\r')=='stop':
+				self.state='normal'
+				if self.stopmessageeveryone!=None:
+					self.transmitToEveryoneInRoom(self.stopmessageeveryone,player.room,False)
+				return(True, self.endcastmessage)
+			else:
+				return(True, self.state)
 		try:
 			if self.referenceArguments['factory']==None and factory!=None:
 				self.referenceArguments['factory']=factory
