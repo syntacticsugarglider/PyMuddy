@@ -217,7 +217,7 @@ class GameFactory(protocol.Factory):
 		self.protocol=GameProtocol(self)
 		return self.protocol
 def tick():
-	print('doing work')
+	world.doTick()
 l=task.LoopingCall(tick)
 l.start(1)
 endpoints.serverFromString(reactor, "tcp:1337").listen(GameFactory())

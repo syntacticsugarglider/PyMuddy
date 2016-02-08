@@ -13,6 +13,26 @@ class CommandParser:
 		self.referenceArguments={'world':world,'commandprocessor':self,'factory':None,'player':None,'protocol':None}
 		self.blockingInput=''
 		self.state='normal'
+	def _tick(self,player,world):
+		try:
+			self.transmitToCurrentPlayer(self.pertickmemessage.encode('utf8'))
+		except:
+			pass
+		try:
+			player.sanity-=self.ticksanitycost
+			self.transmitToCurrentPlayer(('The spell drains %s sanity, leaving you with %s' % (str(self.ticksanitycost),str(player.sanity))).encode('utf8'))
+		except:
+			pass
+		try:
+			player.health-=self.tickhealthcost
+			self.transmitToCurrentPlayer(('The spell drains %s health, leaving you with %s' % (str(self.tickhealthcost),str(player.health))).encode('utf8'))
+		except:
+			pass
+		try:
+			self.transmitToEveryoneInRoom(self.pertickmessageeveryone.encode('utf8'),player.room,False)
+		except:
+			pass
+
 	def addCommand(self,name,function,properties_dict):
 		self.commands[name]=(function,properties_dict)
 	def setEnv(self,envname,value):
@@ -83,10 +103,11 @@ class CommandParser:
 		for client in list(self.referenceArguments['factory'].clients):
 			client_list.append(client.player)
 		return client_list
-	def parseCommand(self,input,player,factory):
+	def parseCommand(self,input,player,factory,world):
 		if self.state!='normal':
 			if input.strip('\n\r')=='stop':
 				self.state='normal'
+				world.removeTickCall(self._tick)
 				if self.stopmessageeveryone!=None:
 					self.transmitToEveryoneInRoom(self.stopmessageeveryone,player.room,False)
 				return(True, self.stopmessageme)
@@ -119,12 +140,12 @@ class CommandParser:
 			return(True,command(splits[1:],**argument_list))
 		except KeyError:
 			if input.strip('\n\r') in player.spells.keys():
-				return (True,self.castSpell(input.strip('\n\r'),player))
+				return (True,self.castSpell(input.strip('\n\r'),player,world))
 			elif ' '.join(input.strip('\n\r').split(' ')[:-1]) in player.spells.keys():
-				 return (True,self.castSpell(input.strip('\n\r'),player))
+				 return (True,self.castSpell(input.strip('\n\r'),player,world))
 			else:
 				return (False,self.environmentVariables['commandnotfoundmessages'][0])
-	def castSpell(self,spellname,player):
+	def castSpell(self,spellname,player,world):
 		spell=player.spells[spellname]
 		self.transmitToCurrentPlayer(spell['startcastmessage'].encode('utf8'))
 		if spell['startcastaroundtarget']!='':
@@ -138,10 +159,19 @@ class CommandParser:
 			if startcosttype=='health':
 				player.health-=int(csplit[csplit.index('start')+2])
 				self.transmitToCurrentPlayer(('The spell drains %s health, leaving you with %s' % (str(csplit[csplit.index('start')+2]),str(player.health))).encode('utf8'))
+		if 'tick' in csplit:
+			tickcosttype=csplit[csplit.index('tick')+1]
+			if tickcosttype=='sanity':
+				self.ticksanitycost=int(csplit[csplit.index('tick')+2])
+			if tickcosttype=='health':
+				self.tickhealthcost=int(csplit[csplit.index('tick')+2])
+			self.tickcosttype=tickcosttype
 		asplit=spell['action'].split(' ')
 		AOE=False
 		if 'tick' in asplit:
+			tick=True
 			self.state=spell['runningmessage']
+			world.addTickCall(self._tick,player,world)
 			self.stopmessageme=spell['endcastmessage']
 			if spell['endcastmessagearoundtarget']!='':
 				self.stopmessageeveryone=spell['endcastmessagearoundtarget']
@@ -170,7 +200,17 @@ class World:
 		self.rooms[initialroom.name]=initialroom
 		self.spawn=self.rooms[initialroom.name]
 		self.state=''
+		self.tickfuncs=[]
 		self.registerCommands()
+	def doTick(self):
+		for tick in self.tickfuncs:
+			tick[0](*tick[1])
+	def addTickCall(self,call,*args):
+		self.tickfuncs.append((call,args))
+	def removeTickCall(self,call):
+		for tickfunc in self.tickfuncs:
+			if tickfunc[0]==call:
+				self.tickfuncs.remove(tickfunc)
 	def registerCommands(self):
 		#IMPORTANT!!!
 		#DEFINE NEW COMMANDS HERE USING UPDATED API, NOT IN THE WORLD COMMAND PARSER CALL
@@ -315,7 +355,7 @@ class World:
 			return ''
 		command_array=command.split()
 		player=self.players[playername]
-		parsing_response=self.commandParser.parseCommand(command,player,factory)
+		parsing_response=self.commandParser.parseCommand(command,player,factory,self)
 		if parsing_response[0]:
 			return parsing_response[1]
 		else:
