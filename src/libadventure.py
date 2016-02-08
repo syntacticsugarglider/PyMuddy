@@ -690,6 +690,7 @@ class Room:
 class Player:
 	def __init__(self,name):
 		self.health=100
+		self.isdenied=False
 		self.maxhealth=100
 		self.learned=False
 		self.can_attack=True
