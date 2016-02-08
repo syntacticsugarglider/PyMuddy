@@ -27,10 +27,10 @@ class CommandParser:
 			self.transmitToCurrentPlayer(('The spell drains %s health, leaving you with %s' % (str(self.tickhealthcost),str(player.health))).encode('utf8'))
 		except:
 			pass
-		if self.tickhealth!=None:
-			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your health' % (player.name,str(self.tickhealth))).encode('utf8'))
+		if self.tickdamage!=None:
+			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your health' % (player.name,str(self.tickdamage))).encode('utf8'))
 			for foo,playerx in player.room.players.iteritems():
-				playerx.health-=tickhealth
+				playerx.health-=tickdamage
 		if self.ticksanity!=None:
 			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your sanity' % (player.name,str(self.ticksanity))).encode('utf8'))
 			for foo,playerx in player.room.players.iteritems():
@@ -328,7 +328,7 @@ class World:
 				text='You have the capability to use the following spells. This is a gift, use your power wisely.\n\n'
 				for trigger,spelldict in player.spells.iteritems():
 					text+=spelldict['spell']+'\n'
-				commandprocessor.transmitToEveryoneInRoom('%s flips through a glowing book. You feel that they possess some great power.' % player.name,player.room,False)
+				commandprocessor.transmitToEveryoneInRoom('%s flips through a glowing book. You feel that it possesses some great power.' % player.name,player.room,False)
 				return text
 			else:
 				return "I'm not sure I understand you."
