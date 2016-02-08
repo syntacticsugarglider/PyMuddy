@@ -216,7 +216,7 @@ class World:
 			if player.learned:
 				text='You have the capability to use the following spells. This is a gift, use your power wisely.\n\n'
 				text+="Words of power 'Wra Seraf Domoff Neru Sa Loka': Song of No Silence - Twisted Chaotic Evil aligned spell, AOE denial/damage\n"
-				commandprocessor.transmitToEveryoneInRoom('%s flips through a glowing spellbook' % player.name)
+				commandprocessor.transmitToEveryoneInRoom('%s flips through a glowing spellbook' % player.name,player.room,False)
 				return text
 			else:
 				return "I'm not sure I understand you."
