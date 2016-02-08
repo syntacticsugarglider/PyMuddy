@@ -207,6 +207,7 @@ class World:
 					else:
 						commandprocessor.transmitToEveryoneInRoom('%s reads %s' % (player.name,item.name),commandprocessor.referenceArguments['player'].room,False)
 						commandprocessor.referenceArguments['player'].learned=True
+						item.read=True
 						return item.properties['readmessage']
 				else:
 					return "That's not a book!"
