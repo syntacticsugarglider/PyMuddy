@@ -133,10 +133,10 @@ class CommandParser:
 		if 'start' in csplit:
 			startcosttype=csplit[csplit.index('start')+1]
 			if startcosttype=='sanity':
-				player.sanity-=csplit[csplit.index('start')+2]
+				player.sanity-=int(csplit[csplit.index('start')+2])
 				self.transmitToCurrentPlayer(('The spell drains %s sanity, leaving you with %s' % (str(csplit[csplit.index('start')+2]),str(player.sanity))).encode('utf8'))
 			if startcosttype=='health':
-				player.health-=csplit[csplit.index('start')+2]
+				player.health-=int(csplit[csplit.index('start')+2])
 				self.transmitToCurrentPlayer(('The spell drains %s health, leaving you with %s' % (str(csplit[csplit.index('start')+2]),str(player.health))).encode('utf8'))
 		asplit=spell['action'].split(' ')
 		AOE=False
