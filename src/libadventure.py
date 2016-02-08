@@ -14,7 +14,7 @@ class CommandParser:
 		self.blockingInput=''
 		self.state='normal'
 	def _tick(self,player,world):
-		self.transmitToCurrentPlayer(self.pertickmemessage.encode('utf8'))
+		self.transmitToCurrentPlayer(self.pertickmessageme.encode('utf8'))
 
 		try:
 			player.sanity-=self.ticksanitycost
