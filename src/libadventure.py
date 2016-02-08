@@ -196,7 +196,7 @@ class World:
 					data='\n\r'
 					data+=gamepagers.getManualForCommand(each)
 				return data
-		def readCommand(line, player=None, commmandprocessor=None):
+		def readCommand(line, player=None,commandprocessor=None):
 			name=(' ').join(line)
 			item=player.getInventoryItemByDescription(name)
 			if item!=None:
