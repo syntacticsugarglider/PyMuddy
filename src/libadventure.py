@@ -127,8 +127,8 @@ class CommandParser:
 	def castSpell(self,spellname,player):
 		spell=player.spells[spellname]
 		self.transmitToCurrentPlayer(spell['startcastmessage'].encode('utf8'))
-		if spell['startcastmessagearoundtarget']!='':
-			self.transmittoEveryoneInRoom(spell['startcastmessagearoundtarget'].replace('</>',player.name).encode('utf8'),player.room,False)
+		if spell['startcastaroundtarget']!='':
+			self.transmittoEveryoneInRoom(spell['startcastaroundtarget'].replace('</>',player.name).encode('utf8'),player.room,False)
 		csplit=spell['cost'].split(' ')
 		if 'start' in csplit:
 			startcosttype=csplit[csplit.index('start')+1]
