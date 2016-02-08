@@ -26,5 +26,5 @@ class Entity(object):
 class Item(Entity):
 	def __init__(self,filepath):
 		self.additions=''
-		read=False
+		self.read=False
 		super(Item,self).__init__(filepath)

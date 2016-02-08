@@ -598,7 +598,7 @@ class Player:
 	def __init__(self,name):
 		self.health=100
 		self.maxhealth=100
-		learned=False
+		self.learned=False
 		self.can_attack=True
 		self.equipped=None
 		self.inventory=libinventory.Inventory()
