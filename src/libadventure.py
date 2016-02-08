@@ -205,7 +205,7 @@ class World:
 					if item.read:
 						return "You've already gained knowledge from this text. Use 'spells' to use this in the future."
 					else:
-						commandprocessor.transmitToEveryoneInRoom('%s reads %s' % (player.name,item.name),commandprocessor.referenceArguments['player'].room,false)
+						commandprocessor.transmitToEveryoneInRoom('%s reads %s' % (player.name,item.name),commandprocessor.referenceArguments['player'].room,False)
 						commandprocessor.referenceArguments['player'].learned=True
 						return item.properties['readmessage']
 				else:
