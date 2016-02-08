@@ -28,11 +28,11 @@ class CommandParser:
 		except:
 			pass
 		if self.tickdamage!=None:
-			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your health' % (player.name,str(self.tickdamage))).encode('utf8'))
+			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your health' % (player.name,str(self.tickdamage))).encode('utf8'),player.room,False)
 			for foo,playerx in player.room.players.iteritems():
 				playerx.health-=tickdamage
 		if self.ticksanity!=None:
-			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your sanity' % (player.name,str(self.ticksanity))).encode('utf8'))
+			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your sanity' % (player.name,str(self.ticksanity))).encode('utf8'),player.room,False)
 			for foo,playerx in player.room.players.iteritems():
 				playerx.sanity-=ticksanity
 		self.transmitToEveryoneInRoom(self.pertickmessageeveryone.encode('utf8'),player.room,False)
