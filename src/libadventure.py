@@ -12,6 +12,7 @@ class CommandParser:
 		self.environmentVariables={'commandnotfoundmessages':['I\'m not sure I understand you.']}
 		self.referenceArguments={'world':world,'commandprocessor':self,'factory':None,'player':None,'protocol':None}
 		self.blockingInput=''
+		self.state='normal'
 	def addCommand(self,name,function,properties_dict):
 		self.commands[name]=(function,properties_dict)
 	def setEnv(self,envname,value):
@@ -83,6 +84,14 @@ class CommandParser:
 			client_list.append(client.player)
 		return client_list
 	def parseCommand(self,input,player,factory):
+		if self.state!='normal':
+			if input.strip('\n\r')=='stop'
+			self.state='normal'
+			if self.stopmessageeveryone!=None:
+				self.transmitToEveryoneInRoom(self.stopmessageeveryone,player.room,False)
+			return(True, self.endcastmessage)
+		else:
+			return(True, self.state)
 		try:
 			if self.referenceArguments['factory']==None and factory!=None:
 				self.referenceArguments['factory']=factory
@@ -109,7 +118,43 @@ class CommandParser:
 						argument_list[argument_name]=self.referenceArguments[argument_name]
 			return(True,command(splits[1:],**argument_list))
 		except KeyError:
-			return (False,self.environmentVariables['commandnotfoundmessages'][0])
+			if input.strip('\n\r') in player.spells.keys():
+				return (True,self.castSpell(input.strip('\n\r'),player))
+			elif ' '.join(input.strip('\n\r').split(' ')[:-1]) in player.spells.keys():
+				 return (True,self.castSpell(input.strip('\n\r'),player))
+			else:
+				return (False,self.environmentVariables['commandnotfoundmessages'][0])
+	def castSpell(self,spellname,player):
+		spell=player.spells[spellname]
+		self.transmitToCurrentPlayer(spell['startcastmessage'].encode('utf8'))
+		if spell['startcastmessagearoundtarget']!='':
+			self.transmittoEveryoneInRoom(spell['startcastmessagearoundtarget'].replace('</>',player.name).encode('utf8'),player.room,False)
+		csplit=spell['cost'].split(' ')
+		if 'start' in csplit:
+			startcosttype=csplit[csplit.index('start')+1]
+			if startcosttype=='sanity':
+				player.sanity-=csplit[csplit.index('start')+2]
+				self.transmitToCurrentPlayer(('The spell drains %s sanity, leaving you with %s' % (str(csplit[csplit.index('start')+2]),str(player.sanity))).encode('utf8'))
+			if startcosttype=='health':
+				player.health-=csplit[csplit.index('start')+2]
+				self.transmitToCurrentPlayer(('The spell drains %s health, leaving you with %s' % (str(csplit[csplit.index('start')+2]),str(player.health))).encode('utf8'))
+		asplit=spell['action'].split(' ')
+		AOE=False
+		if 'tick' in asplit:
+			self.state=spell['runningmessage']
+			self.stopmessageme=spell['endcastmessage']
+			if spell['endcastmessagearoundtarget']!='':
+				self.stopmessageeveryone=spell['endcastmessagearoundtarget']
+			else:
+				self.stopmessageeveryone=None
+		if asplit[0]=='AOE':
+			AOE=True
+		if 'tickeveryonemessage' in asplit:
+			self.pertickmessageeveryone=asplit[asplit.index('tickeveryonemessage')+1].replace("("," ").replace(")"," ").replace("'"," ")
+		if 'tickmemessage' in asplit:
+			self.pertickmessageme=asplit[asplit.index('tickmemessage')+1].replace("("," ").replace(")"," ").replace("'"," ")
+
+
 #Cthulhu was here
 def log(text):
 	text2="[%s - gamefiles] %s" % ((str(datetime.now())),text)
@@ -208,6 +253,8 @@ class World:
 						commandprocessor.transmitToEveryoneInRoom('%s reads %s' % (player.name,item.name),commandprocessor.referenceArguments['player'].room,False)
 						commandprocessor.referenceArguments['player'].learned=True
 						item.read=True
+						bookprops=item.properties
+						commandprocessor.referenceArguments['player'].spells[bookprops['trigger']]=bookprops
 						return item.properties['readmessage']
 				else:
 					return "That's not a book!"
@@ -216,8 +263,9 @@ class World:
 		def spellsCommand(line,player=None,commandprocessor=None):
 			if player.learned:
 				text='You have the capability to use the following spells. This is a gift, use your power wisely.\n\n'
-				text+="Words of power 'Wra Seraf Domoff Neru Sa Loka': Song of No Silence - Twisted Chaotic Evil aligned spell, AOE denial/damage\n"
-				commandprocessor.transmitToEveryoneInRoom('%s flips through a glowing spellbook' % player.name,player.room,False)
+				for trigger,spelldict in player.spells.iteritems():
+					text+=spelldict['spell']+'\n'
+				commandprocessor.transmitToEveryoneInRoom('%s flips through a glowing book. You feel that they possess some great power.' % player.name,player.room,False)
 				return text
 			else:
 				return "I'm not sure I understand you."
@@ -604,6 +652,8 @@ class Player:
 		self.equipped=None
 		self.inventory=libinventory.Inventory()
 		self.name=name
+		self.spells={}
+		self.sanity=100
 	def take_damage(self,damage):
 		self.health-=int(damage)
 		if self.health<=0:

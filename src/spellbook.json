@@ -1,1 +1,14 @@
-{"shortdescription":"weathered grimoire","name":"a weathered grimoire","longdescription":"A mysterious runed book. As you examine it, you feel that it holds great power, but you also feel an intense and dreadful foreboding, as if some incredibly malicious force resides within.","type":"book","readmessage":"As you open the weathered book, you feel a strange tingling sensation in your hands, as if great power is coursing through you. The pages should be yellow with age, but they are white, too white. So white it hurts to look upon them. The runes carved into them are cryptic, seem to shift and wind through the pages.\n You feel as if you have been imparted with some great secret, some long-lost knowledge of great importance.\n<SPELLBOOK ACQUIRED>\nYou may now type 'spells' to view your spells."}
+{"shortdescription":"weathered grimoire",
+  "name":"a weathered grimoire",
+  "longdescription":"A mysterious runed book. As you examine it, you feel that it holds great power, but you also feel an intense and dreadful foreboding, as if some incredibly malicious force resides within.",
+  "type":"book",
+  "readmessage":"As you open the weathered book, you feel a strange tingling sensation in your hands, as if great power is coursing through you. The pages should be yellow with age, but they are white, too white. So white it hurts to look upon them. The runes carved into them are cryptic, seem to shift and wind through the pages.\n You feel as if you have been imparted with some great secret, some long-lost knowledge of great importance.\n<SPELLBOOK ACQUIRED>\nYou may now type 'spells' to view your new spell.",
+  "spell":"Words of power 'Wra Seraf Domoff Neru Sa Loka': Song of No Silence - Twisted Chaotic Evil aligned spell, AOE denial/damage",
+  "trigger":"Wra Seraf Domoff Neru Sa Loka",
+  "startcastmessage":"You begin to sing a song of unspeakable evil, and your mind begins to twist, as you throw away your sanity for great power. Type 'stop' to stop singing.",
+  "startcastaroundtarget":"</> begins to sing a song of unspeakable evil, some twisted work of the devil",
+  "action":"AOE tick deny damage tickmemessage ('The song twists your mind, consuming a piece of your sanity') tickeveryonemessage ('The song consumes your mind, rendering you unable to perform any actions. Your flesh slowly begins to wither away.')",
+  "cost":"tick sanity 2 start sanity 5",
+  "runningmessage":"The song fills your mind. You cannot perform any actions until you stop.",
+  "endcastmessage":"You stop singing.",
+  "endcastmessagearoundtarget":"</> stops singing"}
