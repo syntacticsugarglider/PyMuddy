@@ -128,7 +128,7 @@ class CommandParser:
 		spell=player.spells[spellname]
 		self.transmitToCurrentPlayer(spell['startcastmessage'].encode('utf8'))
 		if spell['startcastaroundtarget']!='':
-			self.transmittoEveryoneInRoom(spell['startcastaroundtarget'].replace('</>',player.name).encode('utf8'),player.room,False)
+			self.transmitToEveryoneInRoom(spell['startcastaroundtarget'].replace('</>',player.name).encode('utf8'),player.room,False)
 		csplit=spell['cost'].split(' ')
 		if 'start' in csplit:
 			startcosttype=csplit[csplit.index('start')+1]
