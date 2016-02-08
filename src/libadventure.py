@@ -47,7 +47,18 @@ class CommandParser:
 				if factory==client and not transmittoself:
 					pass
 				else:
-					client.sendLine(text.encode('utf8'))
+					client.sendLine(line.encode('utf8'))
+			return True
+		except KeyError:
+			return False
+	def transmitToEveryoneInRoom(self,line,room,transmittoself):
+		try:
+			for foo,player in room.players.iteritems():
+				if player==self.referenceArguments['player']:
+					if transmittoself:
+						player.thing.sendLine(line.encode('utf8'))
+				else:
+					player.thing.sendLine(line.encode('utf8'))
 			return True
 		except KeyError:
 			return False
@@ -185,18 +196,32 @@ class World:
 					data='\n\r'
 					data+=gamepagers.getManualForCommand(each)
 				return data
-		def readCommand(line, player=None):
+		def readCommand(line, player=None, commmandprocessor=None):
 			name=(' ').join(line)
 			item=player.getInventoryItemByDescription(name)
 			if item!=None:
 				item=item[0]
 				if item.properties['type']=='book':
-					return item.properties['readmessage']
+					if item.read:
+						return "You've already gained knowledge from this text. Use 'spells' to use this in the future."
+					else:
+						commandprocessor.transmitToEveryoneInRoom('%s reads %s' % (player.name,item.name),commandprocessor.referenceArguments['player'].room,false)
+						commandprocessor.referenceArguments['player'].learned=True
+						return item.properties['readmessage']
 				else:
-					"That's not a book!"
+					return "That's not a book!"
 			else:
 				return "You aren't carrying that!"
-		self.commandParser.addCommand('read',readCommand,{'args':['player']})
+		def spellsCommand(line,player=None,commandprocessor=None):
+			if player.learned:
+				text='You have the capability to use the following spells. This is a gift, use your power wisely.\n\n'
+				text+="Words of power 'Wra Seraf Domoff Neru Sa Loka': Song of No Silence - Twisted Chaotic Evil aligned spell, AOE denial/damage\n"
+				commandprocessor.transmitToEveryoneInRoom('%s flips through a glowing spellbook' % player.name)
+				return text
+			else:
+				return "I'm not sure I understand you."
+		self.commandParser.addCommand('spells',spellsCommand,{'args':['player','commandprocessor']})
+		self.commandParser.addCommand('read',readCommand,{'args':['player','commandprocessor']})
 		self.commandParser.addCommand('phish',phishCommand,{'args':['world','commandprocessor']})
 		self.commandParser.addCommand('attack',attackCommand,{'args':['world','commandprocessor','player']})
 		self.commandParser.registerCommandAlias('attack','kill')
@@ -573,6 +598,7 @@ class Player:
 	def __init__(self,name):
 		self.health=100
 		self.maxhealth=100
+		learned=False
 		self.can_attack=True
 		self.equipped=None
 		self.inventory=libinventory.Inventory()
