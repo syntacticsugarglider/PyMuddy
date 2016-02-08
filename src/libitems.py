@@ -25,4 +25,5 @@ class Entity(object):
 		self=None
 class Item(Entity):
 	def __init__(self,filepath):
+		self.additions=''
 		super(Item,self).__init__(filepath)
