@@ -89,7 +89,7 @@ class CommandParser:
 				self.state='normal'
 				if self.stopmessageeveryone!=None:
 					self.transmitToEveryoneInRoom(self.stopmessageeveryone,player.room,False)
-				return(True, self.endcastmessage)
+				return(True, self.stopmessageme)
 			else:
 				return(True, self.state)
 		try:
