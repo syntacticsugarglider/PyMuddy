@@ -13,6 +13,7 @@ class CommandParser:
 		self.referenceArguments={'world':world,'commandprocessor':self,'factory':None,'player':None,'protocol':None}
 		self.blockingInput=''
 		self.state='normal'
+		self.deniedplayers=[]
 	def _tick(self,player,world):
 		self.transmitToCurrentPlayer(self.pertickmessageme.encode('utf8'))
 
@@ -26,7 +27,14 @@ class CommandParser:
 			self.transmitToCurrentPlayer(('The spell drains %s health, leaving you with %s' % (str(self.tickhealthcost),str(player.health))).encode('utf8'))
 		except:
 			pass
-
+		if self.tickhealth!=None:
+			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your health' % (player.name,str(self.tickhealth))).encode('utf8'))
+			for foo,playerx in player.room.players.iteritems():
+				playerx.health-=tickhealth
+		if self.ticksanity!=None:
+			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your sanity' % (player.name,str(self.ticksanity))).encode('utf8'))
+			for foo,playerx in player.room.players.iteritems():
+				playerx.sanity-=ticksanity
 		self.transmitToEveryoneInRoom(self.pertickmessageeveryone.encode('utf8'),player.room,False)
 
 	def addCommand(self,name,function,properties_dict):
@@ -106,6 +114,9 @@ class CommandParser:
 			if input.strip('\n\r')=='stop':
 				self.state='normal'
 				world.removeTickCall(self._tick)
+				for player in self.deniedplayers:
+					player.isdenied=False
+					self.deniedplayers.remove(player)
 				if self.stopmessageeveryone!=None:
 					self.transmitToEveryoneInRoom(self.stopmessageeveryone,player.room,False)
 				return(True, self.stopmessageme)
@@ -170,6 +181,13 @@ class CommandParser:
 			for name,playerx in player.room.players.iteritems():
 				if playerx!=player:
 					playerx.isdenied=True;
+					self.deniedplayers.append(playerx)
+		self.tickdamage=None
+		self.ticksanity=None
+		if 'damage' in asplit:
+			self.tickdamage=int(asplit[asplit.index('damage')+1])
+		if 'sanity' in asplit:
+			self.ticksanity=int(asplit[asplit.index('sanity')+1])
 		AOE=False
 		if 'tick' in asplit:
 			tick=True
@@ -699,12 +717,12 @@ class Player:
 		self.inventory=libinventory.Inventory()
 		self.name=name
 		self.spells={}
+		self.isdead=False
 		self.sanity=100
 	def take_damage(self,damage):
 		self.health-=int(damage)
 		if self.health<=0:
-			items=[libitems.Item('knifeaxe.json')]*100000
-			self.room.contents[items[0].name]=items
+			self.isdead=True
 	def getCurrentRoomContents(self):
 		return self.room.contents
 	def combatAttacked(self,damage,attacker):
