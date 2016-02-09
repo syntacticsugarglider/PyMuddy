@@ -711,7 +711,7 @@ class Room:
 			x=x[1:]
 		self.down=x
 
-class Player:
+class Player(object):
 	def __init__(self,name):
 		self._health=100
 		self.isdenied=False
