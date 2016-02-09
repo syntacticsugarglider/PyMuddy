@@ -108,6 +108,10 @@ class CommandParser:
 			client_list.append(client.player)
 		return client_list
 	def parseCommand(self,input,player,factory,world):
+		if player.isinsane:
+			return(True, "INSANE IN THE MEMBRANE INSANE GOT NO BRAIN!")
+		if player.isdead:
+			return(True, "Dude, you're a corpse. Good luck with that.")
 		if player.isdenied:
 			return(True,self.denymessage)
 		if self.state!='normal':
@@ -291,8 +295,9 @@ class World:
 			for key,value in player.inventory.items.iteritems():
 				data+='%sx %s%s\n' % (str(len(value)),value[0].shortdescription,''.join(value[0].additions))
 			if data=="":
-				data='Your inventory is empty'
+				data='Your inventory is empty\n'
 			data+='Your health is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
+			data+='Your sanity is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
 			return data
 		def manCommand(line,gamepagers=None):
 			if line==[]:
@@ -708,7 +713,7 @@ class Room:
 
 class Player:
 	def __init__(self,name):
-		self.health=100
+		self._health=100
 		self.isdenied=False
 		self.maxhealth=100
 		self.learned=False
@@ -718,7 +723,26 @@ class Player:
 		self.name=name
 		self.spells={}
 		self.isdead=False
-		self.sanity=100
+		self.isinsane=False
+		self._sanity=100
+	def get_health(self):
+		return self._health
+	def set_health(self, value):
+		if value<0:
+			value=0
+			self.thing.sendLine('You are dead now! |0| |_| 907 |*|/\||\|3|)'.encode('utf8'))
+			self.isdead=True
+		self._health=value
+	def get_sanity(self):
+		return self._sanity
+	def set_sanity(self, value):
+		if value<0:
+			value=0
+			self.thing.sendLine('You are insane now! Insane in the brain, insane, got no brain! Insane in the membrane!'.encode('utf8'))
+			self.isinsane=True
+		self._sanity=value
+	health=property(get_health,set_health)
+	sanity=property(get_sanity,set_sanity)
 	def take_damage(self,damage):
 		self.health-=int(damage)
 		if self.health<=0:
