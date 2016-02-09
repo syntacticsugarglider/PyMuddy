@@ -30,11 +30,13 @@ class CommandParser:
 		if self.tickdamage!=None:
 			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your health' % (player.name,str(self.tickdamage))).encode('utf8'),player.room,False)
 			for foo,playerx in player.room.players.iteritems():
-				playerx.health-=self.tickdamage
+				if playerx!=player:
+					playerx.health-=self.tickdamage
 		if self.ticksanity!=None:
 			self.transmitToEveryoneInRoom(('%s\'s spell drains %s of your sanity' % (player.name,str(self.ticksanity))).encode('utf8'),player.room,False)
 			for foo,playerx in player.room.players.iteritems():
-				playerx.sanity-=self.ticksanity
+				if playerx!=player:
+					playerx.sanity-=self.ticksanity
 		self.transmitToEveryoneInRoom(self.pertickmessageeveryone.encode('utf8'),player.room,False)
 
 	def addCommand(self,name,function,properties_dict):
@@ -297,7 +299,7 @@ class World:
 			if data=="":
 				data='Your inventory is empty\n'
 			data+='Your health is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
-			data+='Your sanity is currently %s out of a maximum of %s\n' % (str(player.health),str(player.maxhealth))
+			data+='Your sanity is currently %s out of a maximum of %s\n' % (str(player.sanity),str(player.maxsanity))
 			return data
 		def manCommand(line,gamepagers=None):
 			if line==[]:
@@ -716,6 +718,7 @@ class Player(object):
 		self._health=100
 		self.isdenied=False
 		self.maxhealth=100
+		self.maxsanity=100
 		self.learned=False
 		self.can_attack=True
 		self.equipped=None
